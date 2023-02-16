@@ -42,6 +42,12 @@ export class FinchPipelineStack extends cdk.Stack {
       environmentStage: ENVIRONMENT_STAGE.Prod,
       env: Config.envProd
     });
-    const prodStage = pipeline.addStage(prodApp);
+    pipeline.addStage(prodApp);
+
+    const releaseApp = new FinchPipelineAppStage(this, 'Release', {
+      environmentStage: ENVIRONMENT_STAGE.Release,
+      env: Config.envRelease
+    });
+    pipeline.addStage(releaseApp);
   }
 }
