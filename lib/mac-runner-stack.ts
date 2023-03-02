@@ -3,6 +3,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { readFileSync } from 'fs';
 import { Construct } from 'constructs';
+import { Tags } from 'aws-cdk-lib';
 
 // the AMI is regional, which means an AMI has diferrent ids in differrent regions
 // when overriding the macOSVersion or amiSearchString props, please make sure that the
@@ -70,6 +71,10 @@ export class MacRunnerStack extends cdk.Stack {
         }
       ]
     });
+
+    //Add the tag for SSM PVRE reporting. This tag is used in the pvre-reporting-template.yml file. 
+    // See Resources.InventoryCollection.Properties.Targets property in pvre-reporting-template.yml file.
+    Tags.of(macInstance).add('PVRE-Reporting', 'SSM')
 
     const cfnInstance = macInstance.node.defaultChild as ec2.CfnInstance;
     cfnInstance.addPropertyOverride('Tenancy', 'host');
