@@ -3,6 +3,8 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { readFileSync } from 'fs';
 import { Construct } from 'constructs';
+import { Tags } from 'aws-cdk-lib';
+import { ENVIRONMENT_STAGE } from './finch-pipeline-app-stage';
 
 // the AMI is regional, which means an AMI has diferrent ids in differrent regions
 // when overriding the macOSVersion or amiSearchString props, please make sure that the
@@ -17,6 +19,7 @@ interface MacRunnerStackProps extends cdk.StackProps {
   amiSearchString?: string;
   hostType?: string;
   architecture?: string;
+  environmentStage?: ENVIRONMENT_STAGE
 }
 
 export class MacRunnerStack extends cdk.Stack {
@@ -70,6 +73,12 @@ export class MacRunnerStack extends cdk.Stack {
         }
       ]
     });
+
+    //Add the tag for SSM PVRE reporting. This tag is used in the pvre-reporting-template.yml file. 
+    // See Resources.InventoryCollection.Properties.Targets property in pvre-reporting-template.yml file.
+    if(props?.environmentStage == ENVIRONMENT_STAGE.Beta) {
+      Tags.of(macInstance).add('PVRE-Reporting', 'SSM')
+    }
 
     const cfnInstance = macInstance.node.defaultChild as ec2.CfnInstance;
     cfnInstance.addPropertyOverride('Tenancy', 'host');

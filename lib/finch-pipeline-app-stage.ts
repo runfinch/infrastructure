@@ -5,6 +5,7 @@ import { ArtifactBucketCloudfrontStack } from './artifact-bucket-cloudfront';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { MacRunnerStack } from './mac-runner-stack';
 import { ContinuousIntegrationStack } from './continuous-integration-stack';
+import { PVREReportingStack } from './pvre-reporting-stack';
 
 export enum ENVIRONMENT_STAGE {
   Beta,
@@ -72,5 +73,8 @@ export class FinchPipelineAppStage extends cdk.Stage {
     this.cloudfrontBucket = artifactBucketCloudfrontStack.bucket;
 
     new ContinuousIntegrationStack(this, 'FinchContinuousIntegrationStack', this.stageName);
+    if (props?.environmentStage == ENVIRONMENT_STAGE.Beta) {
+      new PVREReportingStack(this, 'PVREReportingStack');
+    }
   }
 }
