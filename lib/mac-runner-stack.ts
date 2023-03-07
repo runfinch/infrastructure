@@ -76,9 +76,7 @@ export class MacRunnerStack extends cdk.Stack {
 
     //Add the tag for SSM PVRE reporting. This tag is used in the pvre-reporting-template.yml file. 
     // See Resources.InventoryCollection.Properties.Targets property in pvre-reporting-template.yml file.
-    if(props?.environmentStage == ENVIRONMENT_STAGE.Beta) {
-      Tags.of(macInstance).add('PVRE-Reporting', 'SSM')
-    }
+    Tags.of(macInstance).add('PVRE-Reporting', 'SSM')
 
     const cfnInstance = macInstance.node.defaultChild as ec2.CfnInstance;
     cfnInstance.addPropertyOverride('Tenancy', 'host');
