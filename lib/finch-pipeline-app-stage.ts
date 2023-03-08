@@ -9,8 +9,7 @@ import { PVREReportingStack } from './pvre-reporting-stack';
 
 export enum ENVIRONMENT_STAGE {
   Beta,
-  Prod,
-  Release
+  Prod
 }
 
 interface FinchPipelineAppStageProps extends cdk.StageProps {
@@ -41,7 +40,6 @@ export class FinchPipelineAppStage extends cdk.Stage {
     {'stackName':'macOS12amd64StackBeta', 'ver':'12.6','arch':'x86_64_mac'},
     {'stackName':'macOS12arm64StackBeta', 'ver':'12.6','arch':'arm64_mac'}
   ];
-
   private ProdRunnerStack: MacConfig[] = [
     {'stackName':'macOS12amd64Stack1', 'ver':'12.6','arch':'x86_64_mac'},
     {'stackName':'macOS12arm64Stack1', 'ver':'12.6','arch':'arm64_mac'},
@@ -57,30 +55,16 @@ export class FinchPipelineAppStage extends cdk.Stage {
     {'stackName':'macOS11arm64Stack3', 'ver':'11.7','arch':'arm64_mac'}
   ];
 
-  private ReleaseRunnerStack: MacConfig[] = [
-    {'stackName':'macOS12amd64StackRelease', 'ver':'12.6','arch':'x86_64_mac'},
-    {'stackName':'macOS12arm64StackRelease', 'ver':'12.6','arch':'arm64_mac'},
-    {'stackName':'macOS11amd64StackRelease', 'ver':'11.7','arch':'x86_64_mac'},
-    {'stackName':'macOS11arm64StackRelease', 'ver':'11.7','arch':'arm64_mac'},
-    {'stackName':'macOS13arm64StackRelease', 'ver':'13.0','arch':'arm64_mac'},
-    {'stackName':'macOS13amd64StackRelease', 'ver':'13.0','arch':'x86_64_mac'},
-    {'stackName':'macOS10amd64StackRelease', 'ver':'10.15','arch':'x86_64_mac'},
-  ]
-
-  constructor(scope: Construct, id: string, props: FinchPipelineAppStageProps) {
+  constructor(scope: Construct, id: string, props?: FinchPipelineAppStageProps) {
     super(scope, id, props);
 
-    if (props.environmentStage === ENVIRONMENT_STAGE.Beta) {
-      this.BetaRunnerStack.forEach((runner: MacConfig) => {
-       this.createMacRunnerStack(props, runner); 
+    if (props?.environmentStage == ENVIRONMENT_STAGE.Beta) {
+      this.BetaRunnerStack.forEach(element => {
+       this.createMacRunnerStack(props, element); 
       });
-    } else if (props.environmentStage === ENVIRONMENT_STAGE.Prod) {
-      this.ProdRunnerStack.forEach((runner: MacConfig) => {
-        this.createMacRunnerStack(props, runner);
-      })
     } else {
-      this.ReleaseRunnerStack.forEach((runner: MacConfig) => {
-        this.createMacRunnerStack(props, runner)
+      this.ProdRunnerStack.forEach(element => {
+        this.createMacRunnerStack(props, element);
       })
     }
 

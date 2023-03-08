@@ -37,19 +37,11 @@ export class FinchPipelineStack extends cdk.Stack {
         }
       })
     );
-    // Add stages to a wave to deploy them in parallel.
-    const wave = pipeline.addWave("wave")
 
     const prodApp = new FinchPipelineAppStage(this, 'Production', {
       environmentStage: ENVIRONMENT_STAGE.Prod,
       env: Config.envProd
     });
-    wave.addStage(prodApp)
-
-    const releaseApp = new FinchPipelineAppStage(this, 'Release', {
-      environmentStage: ENVIRONMENT_STAGE.Release,
-      env: Config.envRelease
-    });
-    wave.addStage(releaseApp)
+    const prodStage = pipeline.addStage(prodApp);
   }
 }
