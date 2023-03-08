@@ -92,5 +92,7 @@
         ]
       }
     ]
-  }
+  },
+  "ami:account=090529234398:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-09bb28e86b754a476",
+  "ami:account=090529234398:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0d4a16c69c1be18c7"
 }
