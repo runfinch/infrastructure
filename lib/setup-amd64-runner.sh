@@ -4,7 +4,9 @@
 HOMEDIR="/Users/ec2-user"
 RUNNER_DIR="$HOMEDIR/ar"
 mkdir -p $RUNNER_DIR && cd $RUNNER_DIR
-curl -o actions-runner-osx-x64-2.302.1.tar.gz -L https://github.com/actions/runner/releases/download/v2.302.1/actions-runner-osx-x64-2.302.1.tar.gz
-echo "cc061fc4ae62afcbfab1e18f1b2a7fc283295ca3459345f31a719d36480a8361  actions-runner-osx-x64-2.302.1.tar.gz" | shasum -a 256 -c
+curl -o actions-runner-osx-x64-2.298.2.tar.gz -L https://github.com/actions/runner/releases/download/v2.298.2/actions-runner-osx-x64-2.298.2.tar.gz
+echo "0fb116f0d16ac75bcafa68c8db7c816f36688d3674266fe65139eefec3a9eb04  actions-runner-osx-x64-2.298.2.tar.gz" | shasum -a 256 -c
 # Extract the installer
-tar xzf ./actions-runner-osx-x64-2.302.1.tar.gz
+tar xzf ./actions-runner-osx-x64-2.298.2.tar.gz
+
+
