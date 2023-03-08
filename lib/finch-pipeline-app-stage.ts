@@ -89,8 +89,6 @@ export class FinchPipelineAppStage extends cdk.Stage {
     this.cloudfrontBucket = artifactBucketCloudfrontStack.bucket;
 
     new ContinuousIntegrationStack(this, 'FinchContinuousIntegrationStack', this.stageName);
-    if (props?.environmentStage == ENVIRONMENT_STAGE.Beta) {
-      new PVREReportingStack(this, 'PVREReportingStack');
-    }
+    new PVREReportingStack(this, 'PVREReportingStack');
   }
 }
