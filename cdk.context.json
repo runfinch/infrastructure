@@ -93,6 +93,8 @@
       }
     ]
   },
+  "ami:account=090529234398:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-09bb28e86b754a476",
+  "ami:account=090529234398:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0d4a16c69c1be18c7",
   "vpc-provider:account=019528120233:filter.isDefault=true:region=us-west-2:returnAsymmetricSubnets=true": {
     "vpcId": "vpc-085eb9c9264d91f89",
     "vpcCidrBlock": "172.31.0.0/16",
