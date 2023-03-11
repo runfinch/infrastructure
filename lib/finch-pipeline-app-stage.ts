@@ -30,13 +30,11 @@ export class FinchPipelineAppStage extends cdk.Stage {
 
     //set the availability zone.
     var availabilityZones = this.node.tryGetContext('availabilityZones');
+    console.debug("availability zones from context: " + availabilityZones);
     //TODO: Improve the availability zone selection logic. Instead of assigning default availability zone, we can throw exception
     // when availability zone from context is empty.
-    var selectedAvailabilityZone = config.defaultAvailabilityZone;
-    if (availabilityZones?.length > 0) {
-      console.debug("availability zones from context: " + availabilityZones);
-      selectedAvailabilityZone = availabilityZones[availabilityZones.length - 1];
-    }
+    var selectedAvailabilityZone = availabilityZones?.at(-1) ?? config.defaultAvailabilityZone;
+    console.debug("selectedAvailabilityZone: " + selectedAvailabilityZone);
     new MacRunnerStack(this, config.stackName, {
       ...parentProps,
       userDataScriptPath: config.arch == 'x86_64_mac' ? './lib/setup-amd64-runner.sh' : './lib/setup-arm64-runner.sh',
