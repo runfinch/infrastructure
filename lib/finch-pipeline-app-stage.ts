@@ -27,10 +27,14 @@ export class FinchPipelineAppStage extends cdk.Stage {
   artifactBucketCloudfrontUrlOutput: CfnOutput;
   public readonly cloudfrontBucket: s3.Bucket;
   private createMacRunnerStack(parentProps: FinchPipelineAppStageProps | undefined, config: MacConfig): void {
+
     //set the availability zone.
     var availabilityZones = this.node.tryGetContext('availabilityZones');
+    //TODO: Improve the availability zone selection logic. Instead of assigning default availability zone, we can throw exception
+    // when availability zone from context is empty.
     var selectedAvailabilityZone = config.defaultAvailabilityZone;
     if(availabilityZones?.length > 0) {
+      console.debug("availability zones: " + availabilityZones)
       selectedAvailabilityZone = availabilityZones[availabilityZones.length-1];
     }
     new MacRunnerStack(this, config.stackName, {
