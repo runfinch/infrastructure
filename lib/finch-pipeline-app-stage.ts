@@ -33,37 +33,37 @@ export class FinchPipelineAppStage extends cdk.Stage {
     //TODO: Improve the availability zone selection logic. Instead of assigning default availability zone, we can throw exception
     // when availability zone from context is empty.
     var selectedAvailabilityZone = config.defaultAvailabilityZone;
-    if(availabilityZones?.length > 0) {
-      console.debug("availability zones: " + availabilityZones)
-      selectedAvailabilityZone = availabilityZones[availabilityZones.length-1];
+    if (availabilityZones?.length > 0) {
+      console.debug("availability zones from context: " + availabilityZones);
+      selectedAvailabilityZone = availabilityZones[availabilityZones.length - 1];
     }
     new MacRunnerStack(this, config.stackName, {
       ...parentProps,
-      userDataScriptPath: config.arch == 'x86_64_mac' ? './lib/setup-amd64-runner.sh' : './lib/setup-arm64-runner.sh', 
+      userDataScriptPath: config.arch == 'x86_64_mac' ? './lib/setup-amd64-runner.sh' : './lib/setup-arm64-runner.sh',
       availabilityZone: selectedAvailabilityZone,
       macOSVersion: config.ver,
       hostType: config.arch == 'x86_64_mac' ? 'mac1.metal' : 'mac2.metal',
       architecture: config.arch,
-    }); 
+    });
   }
 
   private BetaRunnerStack: MacConfig[] = [
-    {'stackName':'macOS12amd64StackBeta', 'ver':'12.6','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS12arm64StackBeta', 'ver':'12.6','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d'}
+    { 'stackName': 'macOS12amd64StackBeta', 'ver': '12.6', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS12arm64StackBeta', 'ver': '12.6', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' }
   ];
   private ProdRunnerStack: MacConfig[] = [
-    {'stackName':'macOS12amd64Stack1', 'ver':'12.6','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS12arm64Stack1', 'ver':'12.6','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS11amd64Stack1', 'ver':'11.7','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS11arm64Stack1', 'ver':'11.7','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS12amd64Stack2', 'ver':'12.6','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS12arm64Stack2', 'ver':'12.6','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS11amd64Stack2', 'ver':'11.7','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS11arm64Stack2', 'ver':'11.7','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS12amd64Stack3', 'ver':'12.6','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS12arm64Stack3', 'ver':'12.6','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS11amd64Stack3', 'ver':'11.7','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d'},
-    {'stackName':'macOS11arm64Stack3', 'ver':'11.7','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d'}
+    { 'stackName': 'macOS12amd64Stack1', 'ver': '12.6', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS12arm64Stack1', 'ver': '12.6', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS11amd64Stack1', 'ver': '11.7', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS11arm64Stack1', 'ver': '11.7', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS12amd64Stack2', 'ver': '12.6', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS12arm64Stack2', 'ver': '12.6', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS11amd64Stack2', 'ver': '11.7', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS11arm64Stack2', 'ver': '11.7', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS12amd64Stack3', 'ver': '12.6', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS12arm64Stack3', 'ver': '12.6', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS11amd64Stack3', 'ver': '11.7', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS11arm64Stack3', 'ver': '11.7', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' }
   ];
 
   constructor(scope: Construct, id: string, props?: FinchPipelineAppStageProps) {
@@ -71,7 +71,7 @@ export class FinchPipelineAppStage extends cdk.Stage {
 
     if (props?.environmentStage == ENVIRONMENT_STAGE.Beta) {
       this.BetaRunnerStack.forEach(element => {
-       this.createMacRunnerStack(props, element); 
+        this.createMacRunnerStack(props, element);
       });
     } else {
       this.ProdRunnerStack.forEach(element => {
