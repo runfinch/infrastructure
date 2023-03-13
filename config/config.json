@@ -2,5 +2,5 @@
     "envPipeline": {"account": "229528898709", "region":"us-west-2"},
     "envBeta": {"account": "820462304213", "region":"us-west-2"},
     "envProd": {"account": "090529234398", "region":"us-west-2"},
-    "envRelease": {"account": "019528120233", "region": "us-west-2"}
+    "envRelease": {"account": "019528120233", "region": "us-east-2"}
 }

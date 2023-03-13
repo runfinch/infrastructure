@@ -67,6 +67,7 @@ export class FinchPipelineAppStage extends cdk.Stage {
   ];
 
   private ReleaseRunnerStack: MacConfig[] = [
+<<<<<<< HEAD
     {'stackName':'macOS12amd64StackRelease', 'ver':'12.6','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
     {'stackName':'macOS12arm64StackRelease', 'ver':'12.6','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
     {'stackName':'macOS11amd64StackRelease', 'ver':'11.7','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
@@ -74,6 +75,15 @@ export class FinchPipelineAppStage extends cdk.Stage {
     {'stackName':'macOS13arm64StackRelease', 'ver':'13.0','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
     {'stackName':'macOS13amd64StackRelease', 'ver':'13.0','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
     {'stackName':'macOS10amd64StackRelease', 'ver':'10.15','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
+=======
+    {'stackName':'macOS12amd64StackRelease', 'ver':'12.6','arch':'x86_64_mac', "defaultAvailabilityZone": "us-east-2c"},
+    {'stackName':'macOS12arm64StackRelease', 'ver':'12.6','arch':'arm64_mac', "defaultAvailabilityZone": "us-east-2c"},
+    {'stackName':'macOS11amd64StackRelease', 'ver':'11.7','arch':'x86_64_mac', "defaultAvailabilityZone": "us-east-2c"},
+    {'stackName':'macOS11arm64StackRelease', 'ver':'11.7','arch':'arm64_mac', "defaultAvailabilityZone": "us-east-2c"},
+    {'stackName':'macOS13arm64StackRelease', 'ver':'13.0','arch':'arm64_mac', "defaultAvailabilityZone": "us-east-2c"},
+    {'stackName':'macOS13amd64StackRelease', 'ver':'13.0','arch':'x86_64_mac', "defaultAvailabilityZone": "us-east-2c"},
+    {'stackName':'macOS10amd64StackRelease', 'ver':'10.15','arch':'x86_64_mac', "defaultAvailabilityZone": "us-east-2c"},
+>>>>>>> a47af06 (change to us-east-2c)
   ]
 
   constructor(scope: Construct, id: string, props: FinchPipelineAppStageProps) {
