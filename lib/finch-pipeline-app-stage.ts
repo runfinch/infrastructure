@@ -61,7 +61,11 @@ export class FinchPipelineAppStage extends cdk.Stage {
     { 'stackName': 'macOS12amd64Stack3', 'ver': '12.6', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
     { 'stackName': 'macOS12arm64Stack3', 'ver': '12.6', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
     { 'stackName': 'macOS11amd64Stack3', 'ver': '11.7', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
-    { 'stackName': 'macOS11arm64Stack3', 'ver': '11.7', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' }
+    { 'stackName': 'macOS11arm64Stack3', 'ver': '11.7', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS13amd64Stack4-1', 'ver': '13.2', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS13arm64Stack4-1', 'ver': '13.2', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS13amd64Stack4-2', 'ver': '13.2', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
+    { 'stackName': 'macOS13arm64Stack4-2', 'ver': '13.2', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' }
   ];
 
   constructor(scope: Construct, id: string, props?: FinchPipelineAppStageProps) {
