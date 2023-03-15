@@ -9,7 +9,8 @@ import { PVREReportingStack } from './pvre-reporting-stack';
 
 export enum ENVIRONMENT_STAGE {
   Beta,
-  Prod
+  Prod,
+  Release
 }
 
 interface FinchPipelineAppStageProps extends cdk.StageProps {
@@ -49,6 +50,7 @@ export class FinchPipelineAppStage extends cdk.Stage {
     { 'stackName': 'macOS12amd64StackBeta', 'ver': '12.6', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
     { 'stackName': 'macOS12arm64StackBeta', 'ver': '12.6', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' }
   ];
+  
   private ProdRunnerStack: MacConfig[] = [
     { 'stackName': 'macOS12amd64Stack1', 'ver': '12.6', 'arch': 'x86_64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
     { 'stackName': 'macOS12arm64Stack1', 'ver': '12.6', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' },
@@ -68,16 +70,30 @@ export class FinchPipelineAppStage extends cdk.Stage {
     { 'stackName': 'macOS13arm64Stack4-2', 'ver': '13.2', 'arch': 'arm64_mac', 'defaultAvailabilityZone': 'us-west-2d' }
   ];
 
-  constructor(scope: Construct, id: string, props?: FinchPipelineAppStageProps) {
+  private ReleaseRunnerStack: MacConfig[] = [
+    {'stackName':'macOS12amd64StackRelease', 'ver':'12.6','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
+    {'stackName':'macOS12arm64StackRelease', 'ver':'12.6','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
+    {'stackName':'macOS11amd64StackRelease', 'ver':'11.7','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
+    {'stackName':'macOS11arm64StackRelease', 'ver':'11.7','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
+    {'stackName':'macOS13arm64StackRelease', 'ver':'13.0','arch':'arm64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
+    {'stackName':'macOS13amd64StackRelease', 'ver':'13.0','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
+    {'stackName':'macOS10amd64StackRelease', 'ver':'10.15','arch':'x86_64_mac', 'defaultAvailabilityZone': 'us-east-2c'},
+  ]
+
+  constructor(scope: Construct, id: string, props: FinchPipelineAppStageProps) {
     super(scope, id, props);
 
-    if (props?.environmentStage == ENVIRONMENT_STAGE.Beta) {
-      this.BetaRunnerStack.forEach(element => {
-        this.createMacRunnerStack(props, element);
+    if (props.environmentStage === ENVIRONMENT_STAGE.Beta) {
+      this.BetaRunnerStack.forEach((runner: MacConfig) => {
+       this.createMacRunnerStack(props, runner); 
       });
+    } else if (props.environmentStage === ENVIRONMENT_STAGE.Prod) {
+      this.ProdRunnerStack.forEach((runner: MacConfig) => {
+        this.createMacRunnerStack(props, runner);
+      })
     } else {
-      this.ProdRunnerStack.forEach(element => {
-        this.createMacRunnerStack(props, element);
+      this.ReleaseRunnerStack.forEach((runner: MacConfig) => {
+        this.createMacRunnerStack(props, runner)
       })
     }
 

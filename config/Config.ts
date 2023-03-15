@@ -9,6 +9,7 @@ class ConfigClass {
   public readonly envPipeline: envProps;
   public readonly envBeta: envProps;
   public readonly envProd: envProps;
+  public readonly envRelease: envProps;
 
   constructor(configFile: any) {
     if (!configFile.envPipeline) {
@@ -25,6 +26,11 @@ class ConfigClass {
       throw new Error('Error: envProd must be specified.');
     }
     this.envProd = configFile.envProd;
+
+    if (!configFile.envRelease) {
+      throw new Error('Error: envRelease must be specified.');
+    }
+    this.envRelease = configFile.envRelease;
   }
 }
 
