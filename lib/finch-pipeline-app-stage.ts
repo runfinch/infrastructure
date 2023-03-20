@@ -97,11 +97,14 @@ export class FinchPipelineAppStage extends cdk.Stage {
       })
     }
 
-    const artifactBucketCloudfrontStack = new ArtifactBucketCloudfrontStack(this, 'ArtifactCloudfront', this.stageName);
-    this.artifactBucketCloudfrontUrlOutput = artifactBucketCloudfrontStack.urlOutput;
-    this.cloudfrontBucket = artifactBucketCloudfrontStack.bucket;
+    if (props.environmentStage !== ENVIRONMENT_STAGE.Release) {
+      const artifactBucketCloudfrontStack = new ArtifactBucketCloudfrontStack(this, 'ArtifactCloudfront', this.stageName);
+      this.artifactBucketCloudfrontUrlOutput = artifactBucketCloudfrontStack.urlOutput;
+      this.cloudfrontBucket = artifactBucketCloudfrontStack.bucket;
+  
+      new ContinuousIntegrationStack(this, 'FinchContinuousIntegrationStack', this.stageName);
+    }
 
-    new ContinuousIntegrationStack(this, 'FinchContinuousIntegrationStack', this.stageName);
     new PVREReportingStack(this, 'PVREReportingStack');
   }
 }
