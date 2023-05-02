@@ -1,13 +1,13 @@
 import * as cdk from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
 import { FinchPipelineStack } from '../lib/finch-pipeline-stack';
-import { Config } from '../config/Config';
+import { EnvConfig } from '../config/env-config';
 
 describe('FinchPipelineStack', () => {
   test('synthesizes the way we expect', () => {
     const app = new cdk.App();
     const stack = new FinchPipelineStack(app, 'TestPipelineStack', {
-      env: Config.envPipeline
+      env: EnvConfig.envPipeline
     });
     const template = Template.fromStack(stack);
 

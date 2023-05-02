@@ -5,20 +5,12 @@
     "us-west-2c",
     "us-west-2d"
   ],
-  "ami:account=820462304213:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-12.6*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0d500eeebb40b2269",
-  "ami:account=820462304213:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-12.6*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0f2a5d588dd77ce97",
-  "ami:account=820462304213:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-11.7*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0c5e75b0a720163ac",
-  "ami:account=820462304213:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-11.7*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0c5ed460f3f5fce48",
   "availability-zones:account=090529234398:region=us-west-2": [
     "us-west-2a",
     "us-west-2b",
     "us-west-2c",
     "us-west-2d"
   ],
-  "ami:account=090529234398:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-12.6*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0d500eeebb40b2269",
-  "ami:account=090529234398:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-12.6*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0f2a5d588dd77ce97",
-  "ami:account=090529234398:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-11.7*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0c5e75b0a720163ac",
-  "ami:account=090529234398:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-11.7*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0c5ed460f3f5fce48",
   "vpc-provider:account=820462304213:filter.isDefault=true:region=us-west-2:returnAsymmetricSubnets=true": {
     "vpcId": "vpc-06de4cdd1050128af",
     "vpcCidrBlock": "172.31.0.0/16",
@@ -93,8 +85,6 @@
       }
     ]
   },
-  "ami:account=090529234398:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-09bb28e86b754a476",
-  "ami:account=090529234398:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0d4a16c69c1be18c7",
   "vpc-provider:account=019528120233:filter.isDefault=true:region=us-east-2:returnAsymmetricSubnets=true": {
     "vpcId": "vpc-09e086b046b77b394",
     "vpcCidrBlock": "172.31.0.0/16",
@@ -126,11 +116,16 @@
       }
     ]
   },
-  "ami:account=019528120233:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-12.6*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-east-2": "ami-0e64f85d193de79ad",
+  "ami:account=820462304213:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0d4a16c69c1be18c7",
+  "ami:account=820462304213:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-09bb28e86b754a476",
+  "ami:account=090529234398:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0d4a16c69c1be18c7",
+  "ami:account=090529234398:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-09bb28e86b754a476",
+  "ami:account=019528120233:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-east-2": "ami-0443fe38484268e21",
+  "ami:account=019528120233:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.2*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-east-2": "ami-0b6842ad7bc30bedf",
+  "ami:account=090529234398:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-12.6*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-0c53a0744bc1bff76",
+  "ami:account=090529234398:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-12.6*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-west-2": "ami-01fdc813940977865",
   "ami:account=019528120233:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-12.6*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-east-2": "ami-0c6d905d74b45d00a",
-  "ami:account=019528120233:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-11.7*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-east-2": "ami-06795a977cbd1adf1",
+  "ami:account=019528120233:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-12.6*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-east-2": "ami-0e64f85d193de79ad",
   "ami:account=019528120233:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-11.7*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-east-2": "ami-0b6c84efbea5e6bb6",
-  "ami:account=019528120233:filters.architecture.0=arm64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.0*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-east-2": "ami-0eda4d10f87666ed0",
-  "ami:account=019528120233:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-13.0*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-east-2": "ami-014d59724ea9d1785",
-  "ami:account=019528120233:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-10.15*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-east-2": "ami-004bcfa364aac0bb1"
+  "ami:account=019528120233:filters.architecture.0=x86_64_mac:filters.image-type.0=machine:filters.name.0=amzn-ec2-macos-11.7*:filters.owner-alias.0=amazon:filters.root-device-type.0=ebs:filters.state.0=available:filters.virtualization-type.0=hvm:region=us-east-2": "ami-06795a977cbd1adf1"
 }
