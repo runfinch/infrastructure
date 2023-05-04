@@ -2,8 +2,9 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { FinchPipelineAppStage } from './finch-pipeline-app-stage';
-import { Config } from '../config/Config';
 import { ENVIRONMENT_STAGE } from './finch-pipeline-app-stage';
+import { EnvConfig } from '../config/env-config';
+import { RunnerConfig } from '../config/runner-config';
 
 export class FinchPipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -24,7 +25,11 @@ export class FinchPipelineStack extends cdk.Stack {
 
     const betaApp = new FinchPipelineAppStage(this, 'Beta', {
       environmentStage: ENVIRONMENT_STAGE.Beta,
-      env: Config.envBeta
+      env: {
+        account: EnvConfig.envBeta.account,
+        region: EnvConfig.envBeta.region
+      },
+      runnerConfig: RunnerConfig.runnerBeta
     });
     const betaStage = pipeline.addStage(betaApp);
     // add a post step for unit and integration tests
@@ -38,18 +43,26 @@ export class FinchPipelineStack extends cdk.Stack {
       })
     );
     // Add stages to a wave to deploy them in parallel.
-    const wave = pipeline.addWave("wave")
+    const wave = pipeline.addWave('wave');
 
     const prodApp = new FinchPipelineAppStage(this, 'Production', {
       environmentStage: ENVIRONMENT_STAGE.Prod,
-      env: Config.envProd
+      env: {
+        account: EnvConfig.envProd.account,
+        region: EnvConfig.envProd.region
+      },
+      runnerConfig: RunnerConfig.runnerProd
     });
-    wave.addStage(prodApp)
+    wave.addStage(prodApp);
 
     const releaseApp = new FinchPipelineAppStage(this, 'Release', {
       environmentStage: ENVIRONMENT_STAGE.Release,
-      env: Config.envRelease
+      env: {
+        account: EnvConfig.envRelease.account,
+        region: EnvConfig.envRelease.region
+      },
+      runnerConfig: RunnerConfig.runnerRelease
     });
-    wave.addStage(releaseApp)
+    wave.addStage(releaseApp);
   }
 }

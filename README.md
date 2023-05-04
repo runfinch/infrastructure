@@ -17,27 +17,12 @@ Or create the key pair with the AWS CLI command below.<br>
 
 ### Self-hosted Runners (Mac Arm64 and Mac Amd64)
 
-The stack `MacRunnerStack` is used to provision EC2 Mac instance which acts as a self-hosted GitHub actions runner, as well as the dedicated physical/metal host which the EC2 instance uses. <br>
+The stack `ASGRunnerStack` is used to provision EC2 Mac instances through an autoscaling group. The runner configurations can be edited in `config/runner-config.json`. <br>
+When the runners are initialized, a user data script (`scripts/setup-runner.sh`) runs to setup the instance. This script downloads and installs [GitHub actions runner application](https://github.com/actions/runner) on the our self-hosted runner, which is used to connect our runner with the GitHub actions. Then the script connects the instance with our GitHub repos, starting the runner service.<br>
 
-The EC2 user data script runs when the instance is launched for the first time and it can be customized for each runner.
+#### Connect to the runners for troubleshooting
 
-This script downloads and installs [GitHub actions runner application](https://github.com/actions/runner) on the our self-hosted runner, which is used to connect our runner with the GitHub actions. It then writes the `cleanup.sh` and `.env` files into the runner application directory. The `cleanup.sh` script deletes the old working directory of the previous job.<br>
-
-#### Connect runners to Github Actions
-
-After the self-hosted runner stack is deployed successfully, run the ssh command to log into the runner.<br>
-`ssh -i runner-key.pem -o IdentitiesOnly=yes ec2-user@xx.xxx.xxx.xxx`<br>
-Connect the runner to the GitHub actions in your repository. Go the the GitHub repo, then navigate to Settings > Actions > Runners > New self-hosted runner, and run the commands in the “Configure” section to connect the runner and start.<br>
-To connect the ec2 runner without using an ssh key, please use Session Manager. Go to the AWS EC2 console, select the instance and click Connect > Session Manager.<br>
-
-#### Starting the runner as a service
-
-Currently, due to an [ongoing issue](https://github.com/actions/runner/issues/1056), the service cannot be run using the normal method. As a workaround, install the service and start `runsvc.sh` in the background. <br>
-
-```bash
-sudo su -- ec2-user ./svc.sh install
-sudo su -- ec2-user ./runsvc.sh start &
-```
+After the runner is linked to the GitHub repo, you can access a runner to trouble shoot it by noting down the name of the runner (usually `ip172-31-xx-xxx`), access the AWS account that hosts the instance, and find the instance with the private IP address matching the name above. Connect to the runner either by using an SSH service with the key saved in the Secret Manager, or use Session Manager in EC2. Go to the AWS EC2 console, select the instance and click Connect > Session Manager.<br>
 
 ### S3 Bucket and Cloudfront Distributions
 
@@ -58,3 +43,12 @@ npm run integration
 ```
 
 Format your code with the command `npm run prettier-format`. <br>
+
+## Host Licensing
+
+When using Auto Scaling Group with macOS instances on EC2, a host license has to be created in AWS License Manager. Create a self-managed license named `MacHostLicense`, set the license type to `sockets`, and save the arn to the `runner-config.json` file.
+
+
+## Access Tokens
+
+Overall, 3 access tokens are required - one for the pipeline to access the runfinch/infrastructure code and update when there is a code update, and two for runfinch/finch and runfinch/finch-core to provide the github runner keys for automatically creating and registering the runners

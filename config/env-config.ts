@@ -1,15 +1,14 @@
-import config from './config.json';
+import config from './env-config.json';
+import * as cdk from 'aws-cdk-lib';
 
-interface envProps {
-  account: string;
-  region: string;
-}
-
-class ConfigClass {
-  public readonly envPipeline: envProps;
-  public readonly envBeta: envProps;
-  public readonly envProd: envProps;
-  public readonly envRelease: envProps;
+/**
+ * Class for environment configurations. Outlines the account and region.
+ */
+class EnvConfigClass {
+  public readonly envPipeline: cdk.Environment;
+  public readonly envBeta: cdk.Environment;
+  public readonly envProd: cdk.Environment;
+  public readonly envRelease: cdk.Environment;
 
   constructor(configFile: any) {
     if (!configFile.envPipeline) {
@@ -34,4 +33,4 @@ class ConfigClass {
   }
 }
 
-export const Config = new ConfigClass(config);
+export const EnvConfig = new EnvConfigClass(config);
