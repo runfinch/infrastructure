@@ -11,7 +11,15 @@ mkdir -p $RUNNER_DIR && cd $RUNNER_DIR
 
 # Configure brew path
 # Adding to .zshenv so that it will load even in non-interactive/login shells
-(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/ec2-user/.zshenv
+UNAME_MACHINE="$(/usr/bin/uname -m)"
+if [[ "${UNAME_MACHINE}" == "arm64" ]]
+then
+  HOMEBREW_PREFIX="/opt/homebrew"
+else
+  HOMEBREW_PREFIX="/usr/local"
+fi
+(echo; echo 'eval "$('"${HOMEBREW_PREFIX}"'/bin/brew shellenv)"') >> $HOME/.zshenv
+# (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> $HOME/.zshenv
 
 # Setup current shell
 PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
