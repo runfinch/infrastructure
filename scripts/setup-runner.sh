@@ -8,6 +8,12 @@ echo $0
 HOMEDIR="/Users/ec2-user"
 RUNNER_DIR="$HOMEDIR/ar"
 mkdir -p $RUNNER_DIR && cd $RUNNER_DIR
+
+# Configure brew path
+# Adding to .zshenv so that it will load even in non-interactive/login shells
+(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/ec2-user/.zshenv
+
+# Setup current shell
 PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 
 # Download and setup the runner
