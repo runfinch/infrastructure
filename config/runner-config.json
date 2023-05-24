@@ -125,14 +125,14 @@
                 "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
             },
             {
-                "macOSVersion": "12.6",
+                "macOSVersion": "13.2",
                 "arch": "arm",
                 "repo": "finch-core",
                 "desiredInstances": 1,
                 "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"] 
             },
             {
-                "macOSVersion": "12.6",
+                "macOSVersion": "13.2",
                 "arch": "x86",
                 "repo": "finch-core",
                 "desiredInstances": 1,
