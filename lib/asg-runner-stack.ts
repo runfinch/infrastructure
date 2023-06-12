@@ -36,10 +36,9 @@ export class ASGRunnerStack extends cdk.Stack {
 
     const securityGroup = new ec2.SecurityGroup(this, 'MacEC2SecurityGroup', {
       vpc,
-      description: 'Allow SSH (TCP port 22) in',
+      description: 'Allow only outbound traffic',
       allowAllOutbound: true
     });
-    securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(22), 'Allow SSH Access');
 
     const role = new iam.Role(this, 'MacEC2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com')
