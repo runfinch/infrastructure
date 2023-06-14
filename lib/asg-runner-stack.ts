@@ -7,6 +7,7 @@ import { Construct } from 'constructs';
 import { RunnerType } from '../config/runner-config';
 import { readFileSync } from 'fs';
 import { ENVIRONMENT_STAGE } from './finch-pipeline-app-stage';
+import { UpdatePolicy } from 'aws-cdk-lib/aws-autoscaling';
 
 interface ASGRunnerStackProps extends cdk.StackProps {
   env: cdk.Environment | undefined;
@@ -168,7 +169,8 @@ export class ASGRunnerStack extends cdk.Stack {
       healthCheck: autoscaling.HealthCheck.ec2({
         grace: cdk.Duration.seconds(3600)
       }),
-      launchTemplate: lt
+      launchTemplate: lt,
+      updatePolicy: UpdatePolicy.rollingUpdate()
     });
 
     if (props.stage === ENVIRONMENT_STAGE.Beta) {
