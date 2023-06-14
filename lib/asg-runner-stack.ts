@@ -170,7 +170,20 @@ export class ASGRunnerStack extends cdk.Stack {
         grace: cdk.Duration.seconds(3600)
       }),
       launchTemplate: lt,
-      updatePolicy: UpdatePolicy.rollingUpdate()
+      updatePolicy: UpdatePolicy.rollingUpdate({
+        // Defaults shown here explicitly except for pauseTime
+        // and minSuccesPercentage
+        maxBatchSize: 1,
+        minInstancesInService: 0,
+        suspendProcesses: [
+          autoscaling.ScalingProcess.HEALTH_CHECK,
+          autoscaling.ScalingProcess.REPLACE_UNHEALTHY,
+          autoscaling.ScalingProcess.AZ_REBALANCE,
+          autoscaling.ScalingProcess.ALARM_NOTIFICATION,
+          autoscaling.ScalingProcess.SCHEDULED_ACTIONS,
+        ],
+        waitOnResourceSignals: true,
+      })
     });
 
     if (props.stage === ENVIRONMENT_STAGE.Beta) {
