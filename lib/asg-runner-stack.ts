@@ -182,7 +182,7 @@ export class ASGRunnerStack extends cdk.Stack {
           autoscaling.ScalingProcess.ALARM_NOTIFICATION,
           autoscaling.ScalingProcess.SCHEDULED_ACTIONS,
         ],
-        waitOnResourceSignals: true,
+        waitOnResourceSignals: false,
       })
     });
 
