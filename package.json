@@ -17,7 +17,7 @@
     "@types/node": "20.4.2",
     "@types/node-fetch": "^2.6.2",
     "@types/prettier": "2.7.3",
-    "aws-cdk": "2.85.0",
+    "aws-cdk": "2.90.0",
     "jest": "^27.5.1",
     "prettier": "^2.8.8",
     "ts-jest": "^27.1.4",
