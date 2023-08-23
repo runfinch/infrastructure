@@ -28,7 +28,7 @@
     "aws-cdk-lib": "2.92.0",
     "axios": "^1.4.0",
     "constructs": "^10.2.69",
-    "node-fetch": "^3.3.2",
+    "node-fetch": "^2.6.7",
     "source-map-support": "^0.5.21"
   }
 }
