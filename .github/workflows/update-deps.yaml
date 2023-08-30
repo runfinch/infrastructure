@@ -1,0 +1,27 @@
+name: Update dependencies
+on:
+  schedule:
+    - cron: '0 11 * * 4' 
+  workflow_dispatch:
+
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # This step fetches the latest version of dependencies, updates that version and sha in runner setup script,
+      - name: update dependencies versions and SHAs
+        run: |
+          ./bin/update-deps.sh
+
+      - name: create PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          # A Personal Access Token instead of the default `GITHUB_TOKEN` is required
+          # to trigger the checks (e.g., e2e tests) on the created pull request.
+          # More info: https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#workarounds-to-trigger-further-workflow-runs
+          token: ${{ secrets.GITHUB_TOKEN }}
+          signoff: true
+          title: 'build(deps): Bump infrastructure dependencies'
