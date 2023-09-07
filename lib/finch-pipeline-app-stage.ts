@@ -9,6 +9,7 @@ import { ContinuousIntegrationStack } from './continuous-integration-stack';
 import { ECRRepositoryStack } from './ecr-repo-stack';
 import { PVREReportingStack } from './pvre-reporting-stack';
 import { PlatformType, RunnerProps } from '../config/runner-config';
+import { EventBridgeScanNotifsStack } from './event-bridge-scan-notifs-stack';
 
 export enum ENVIRONMENT_STAGE {
   Beta,
@@ -57,6 +58,11 @@ export class FinchPipelineAppStage extends cdk.Stage {
 
       this.ecrRepositoryOutput = ecrRepositoryStack.repositoryOutput;
       this.ecrRepository = ecrRepositoryStack.repository;
+
+      // Only report rootfs image scans in prod to avoid duplicate notifications.
+      if (props.environmentStage == ENVIRONMENT_STAGE.Prod) {
+        new EventBridgeScanNotifsStack(this, 'EventBridgeScanNotifsStack', this.stageName)
+      }
 
       new ContinuousIntegrationStack(
         this, 
