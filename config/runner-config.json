@@ -1,7 +1,7 @@
 {
     "runnerBeta": {
         "macLicenseArn": "arn:aws:license-manager:us-west-2:820462304213:license-configuration:lic-7ac3e249bd13f71b44ac34963a8c3353",
-        "windowsLicenseArn": "arn:aws:license-manager:us-west-2:820462304213:license-configuration:lic-56c55a611976d66a1357e58077b19e9",
+        "windowsLicenseArn": "arn:aws:license-manager:us-west-2:820462304213:license-configuration:lic-56c55a611976d66a1357e58077b19e93",
         "runnerTypes": [
             {
                 "platform": "mac",
