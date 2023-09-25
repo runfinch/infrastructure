@@ -8,7 +8,7 @@ import { ASGRunnerStack } from './asg-runner-stack';
 import { ContinuousIntegrationStack } from './continuous-integration-stack';
 import { ECRRepositoryStack } from './ecr-repo-stack';
 import { PVREReportingStack } from './pvre-reporting-stack';
-import { RunnerProps } from '../config/runner-config';
+import { PlatformType, RunnerProps } from '../config/runner-config';
 
 export enum ENVIRONMENT_STAGE {
   Beta,
@@ -30,11 +30,12 @@ export class FinchPipelineAppStage extends cdk.Stage {
   constructor(scope: Construct, id: string, props: FinchPipelineAppStageProps) {
     super(scope, id, props);
     props.runnerConfig.runnerTypes.forEach((runnerType) => {
-      const ASGStackName = 'ASG' + '-' + runnerType.repo + '-' + runnerType.macOSVersion.split('.')[0] + '-' + runnerType.arch + 'Stack'
+      const ASGStackName = `ASG-${runnerType.platform}-${runnerType.repo}-${runnerType.version.split('.')[0]}-${runnerType.arch}Stack`;
+      const licenseArn = runnerType.platform === PlatformType.WINDOWS ? props.runnerConfig.windowsLicenseArn : props.runnerConfig.macLicenseArn;
       new ASGRunnerStack(this, ASGStackName , {
         env: props.env,
         stage: props.environmentStage,
-        licenseArn: props.runnerConfig.licenseArn,
+        licenseArn: licenseArn,
         type: runnerType
       });
     });
