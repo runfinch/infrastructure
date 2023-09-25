@@ -116,7 +116,9 @@ tasks:
       Enter-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId -ShouldDecrementDesiredCapacity $true
 
       # Script runs on login after reboot;
+      $ServiceName=(Get-Service actions.runner.*).name
       $startupscript = @'
+      Invoke-Expression "cmd.exe /c sc config $ServiceName obj= 'NT AUTHORITY\SYSTEM' type= own"
       Start-Service "actions.runner.*"
       Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
       '@
