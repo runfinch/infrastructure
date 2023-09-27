@@ -44,7 +44,6 @@ tasks:
       Add-AppxPackage .\microsoft.ui.xaml.2.7.3\tools\AppX\x64\Release\Microsoft.UI.Xaml.2.7.appx
 
       Invoke-WebRequest -Uri https://github.com/microsoft/terminal/releases/download/v1.17.11461.0/Microsoft.WindowsTerminal_1.17.11461.0_8wekyb3d8bbwe.msixbundle -OutFile .\Microsoft.WindowsTerminal_1.17.11461.0_8wekyb3d8bbwe.msixbundle
-      # Install Windows Terminal
       Add-AppxProvisionedPackage -Online -PackagePath .\Microsoft.WindowsTerminal_1.17.11461.0_8wekyb3d8bbwe.msixbundle -SkipLicense
       Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.WindowsTerminal_1.17.11461.0_8wekyb3d8bbwe
 
@@ -75,8 +74,9 @@ tasks:
       #  Install Go
       Invoke-WebRequest -Uri 'https://go.dev/dl/go1.21.0.windows-amd64.msi' -OutFile 'go1.21.0.windows-amd64.msi'
       Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Users\Administrator\setup\go1.21.0.windows-amd64.msi /quiet'
-      # Configure path
-      $newPath = ("C:\Program Files\Git\usr\bin\;" + "$env:Path" + ";C:\Program Files\Git\bin\;" + "C:\Program Files (x86)\GnuWin32\bin\;" + "C:\Program Files\Go\bin\;") 
+
+      # Configure path; include path to pre release WSL
+      $newPath = ("C:\Program Files\Git\usr\bin\;" + "C:\Program Files\WSL\;" + "$env:Path" + ";C:\Program Files\Git\bin\;" + "C:\Program Files (x86)\GnuWin32\bin\;" + "C:\Program Files\Go\bin\;")
       $env:Path = $newPath
       # Persist the path to the registry for new shells
       Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value $newPath
@@ -115,10 +115,14 @@ tasks:
       $ASGName=(Get-ASAutoScalingInstance -InstanceId $InstanceId).AutoScalingGroupName
       Enter-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId -ShouldDecrementDesiredCapacity $true
 
-      # Script runs on login after reboot;
+      # Script runs on login after reboot to start GitHub Actions service, put the instance InService in the ASG,
+      # and update wsl version to pre-release verion such that ssh / session 0 connections can call wsl
       $ServiceName=(Get-Service actions.runner.*).name
       $startupscript = @'
+      Start-Transcript -Path "C:\StartupScript.log" -Append
       Invoke-Expression "cmd.exe /c sc config $ServiceName obj= 'NT AUTHORITY\SYSTEM' type= own"
+      Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.0.2/wsl.2.0.2.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi'
+      Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
       Start-Service "actions.runner.*"
       Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
       '@
@@ -134,7 +138,7 @@ tasks:
       # Register a scheduled job to attempt a WSL update every day between 10:00am and 10:20am.
       $trigger = New-JobTrigger -Daily -At 10:00 -RandomDelay 00:20:00
       Register-ScheduledJob -Trigger $trigger -Name auto-update-wsl2 -ScriptBlock {
-        wsl --update
+        wsl --update --pre-release
       }
 
       wsl --install
