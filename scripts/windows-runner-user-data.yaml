@@ -120,7 +120,7 @@ tasks:
       $ServiceName=(Get-Service actions.runner.*).name
       $startupscript = @'
       Start-Transcript -Path "C:\StartupScript.log" -Append
-      Invoke-Expression "cmd.exe /c sc config $ServiceName obj= 'NT AUTHORITY\SYSTEM' type= own"
+      Invoke-Expression "cmd.exe /c sc config $ServiceName obj= '$(hostname)\Administrator' type= own"
       Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.0.2/wsl.2.0.2.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi'
       Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
       Start-Service "actions.runner.*"
