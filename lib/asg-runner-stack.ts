@@ -140,6 +140,12 @@ export class ASGRunnerStack extends cdk.Stack {
       ` + readFileSync('./scripts/setup-runner.sh', 'utf8');
     }
 
+    // Create a 100GiB volume to be used as instance root volume
+    const rootVolume: ec2.BlockDevice = {
+      deviceName: '/dev/sda1',
+      volume: ec2.BlockDeviceVolume.ebs(100),
+    };
+
     const asgName = platform === PlatformType.WINDOWS ? 'WindowsASG' : 'MacASG';
     const ltName = `${asgName}LaunchTemplate`
     const lt = new ec2.LaunchTemplate(this, ltName, {
@@ -149,7 +155,8 @@ export class ASGRunnerStack extends cdk.Stack {
       machineImage: machineImage,
       role: role,
       securityGroup: securityGroup,
-      userData: ec2.UserData.custom(userData)
+      userData: ec2.UserData.custom(userData),
+      blockDevices: [rootVolume]
     });
 
     // Escape hatch to cfnLaunchTemplate as the L2 construct lacked some required
