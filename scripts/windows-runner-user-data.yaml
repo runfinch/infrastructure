@@ -86,6 +86,7 @@ tasks:
       $pws7script | Out-File $Home\setup\setup7.ps1
     
       # Execute script with PowerShell 7
+      Write-Information "Running setup7.ps1..."
       $ConsoleCommand = "$Home\setup\setup7.ps1"
       Start-Process "C:\Program Files\PowerShell\7\pwsh" -Wait -NoNewWindow -PassThru -ArgumentList "-Command  &{ $ConsoleCommand }"
 
@@ -111,6 +112,7 @@ tasks:
       # 2. Register a powershell script to be run at instance reboot on login
       # 3. Install WSL2 and restart the instance
 
+      Write-Information "Entering StandBy..."
       $InstanceId=(Get-EC2InstanceMetadata -Category InstanceId)
       $ASGName=(Get-ASAutoScalingInstance -InstanceId $InstanceId).AutoScalingGroupName
       Enter-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId -ShouldDecrementDesiredCapacity $true
@@ -120,10 +122,8 @@ tasks:
       $ServiceName=(Get-Service actions.runner.*).name
       $startupscript = @'
       Start-Transcript -Path "C:\StartupScript.log" -Append
-      Invoke-Expression "cmd.exe /c sc config $ServiceName obj= '$(hostname)\Administrator' type= own"
       Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.0.2/wsl.2.0.2.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi'
       Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
-      Start-Service "actions.runner.*"
       Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
       '@
 
@@ -141,5 +141,25 @@ tasks:
         wsl --update --pre-release
       }
 
+      Write-Information "Changing GHA service ownership to Administrator..."
+      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+      Install-PackageProvider -Name NuGet -Force
+      Install-Module -Name 'Carbon' -AllowClobber -Force
+      # Configure the GitHub Actions runner service to log on as Administrator; grant the Administrator
+      # user "Log on as a Service" privileges via Carbon module:
+      # https://get-carbon.org/Grant-Privilege.html
+      Stop-Service "actions.runner.*"
+      Grant-CPrivilege -Identity "Administrator" "SeServiceLogonRight"
+
+      net user Administrator "$GH_KEY"
+
+      Write-Information "starting GHA service..."
+      Set-Service -Name $ServiceName -StartupType Automatic
+      Start-Service "actions.runner.*"
+
+      Invoke-Expression "cmd.exe /c sc config $ServiceName obj= '$(hostname)\Administrator' password= '$GH_KEY' type= own"
+
       wsl --install
+
+      Write-Information "Restarting instance..."
       Restart-Computer
