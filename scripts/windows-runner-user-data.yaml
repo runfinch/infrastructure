@@ -47,23 +47,20 @@ tasks:
       Add-AppxProvisionedPackage -Online -PackagePath .\Microsoft.WindowsTerminal_1.17.11461.0_8wekyb3d8bbwe.msixbundle -SkipLicense
       Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.WindowsTerminal_1.17.11461.0_8wekyb3d8bbwe
 
-      # https://github.com/microsoft/winget-cli/releases/tag/v1.6.1573-preview
-      Invoke-WebRequest -Uri https://github.com/microsoft/winget-cli/releases/download/v1.6.1573-preview/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -OutFile  .\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
-      Invoke-WebRequest -Uri https://github.com/microsoft/winget-cli/releases/download/v1.6.1573-preview/ba27c402ae29410eb93cfa9cb27f1376_License1.xml -OutFile .\ba27c402ae29410eb93cfa9cb27f1376_License1.xml
-
-      Add-AppxProvisionedPackage -Online -PackagePath .\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -LicensePath .\ba27c402ae29410eb93cfa9cb27f1376_License1.xml
-      Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
+      # Install latest NuGet
+      Install-PackageProvider -Name NuGet -Force
     
-      Write-Information "Manually update package cache and install dependencies"
+      Write-Information "Install dependencies git, make, go, AWS tools, and update path..."
       $pws7script = @'
-      # Fix winget on Windows Server by manually updating the package cache
+      Start-Transcript -Path "$Home\setup\setup7.log" -Append
       Import-Module -Name Appx -UseWindowsPowerShell  
-      Invoke-WebRequest 'https://cdn.winget.microsoft.com/cache/source.msix' -OutFile 'source.msix' -UseBasicParsing
-      Add-AppxPackage -Path source.msix
-      ECHO Y | cmd /c winget upgrade --all --silent
-      # Install dependencies via winget
-      winget install -e --id Git.Git
-      winget install -e --id GnuWin32.Make
+
+      # Install git and Make
+      Invoke-WebRequest -Uri 'https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.2/Git-2.42.0.2-64-bit.exe' -OutFile 'git-2.42.0.exe'
+      .\git-2.42.0.exe /SILENT
+      # use curl to follow redirects
+      & "C:\Windows\System32\curl.exe" -L https://sourceforge.net/projects/gnuwin32/files/make/3.81/make-3.81.exe/download -o make.exe
+      .\make.exe /SILENT
 
       # Install AWS tools
       Install-Module -Name AWS.Tools.Common -Force
@@ -143,7 +140,6 @@ tasks:
 
       Write-Information "Changing GHA service ownership to Administrator..."
       [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-      Install-PackageProvider -Name NuGet -Force
       Install-Module -Name 'Carbon' -AllowClobber -Force
       # Configure the GitHub Actions runner service to log on as Administrator; grant the Administrator
       # user "Log on as a Service" privileges via Carbon module:
