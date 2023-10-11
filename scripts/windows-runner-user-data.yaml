@@ -123,6 +123,8 @@ tasks:
       Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.0.2/wsl.2.0.2.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi'
       Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
       Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
+      Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu'
+      sleep 30 # sleep to allow Ubuntu VM to start
       New-NetFirewallRule -DisplayName "WSL" -Direction Inbound -InterfaceAlias "vEthernet (WSL)" -Action Allow
       '@
 
