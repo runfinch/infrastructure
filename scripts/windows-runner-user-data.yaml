@@ -116,12 +116,14 @@ tasks:
 
       # Script runs on login after reboot to start GitHub Actions service, put the instance InService in the ASG,
       # and update wsl version to pre-release verion such that ssh / session 0 connections can call wsl
+      # Allow inbound connections on vEthernet interface for traffic from wsl to host
       $ServiceName=(Get-Service actions.runner.*).name
       $startupscript = @'
       Start-Transcript -Path "C:\StartupScript.log" -Append
       Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.0.2/wsl.2.0.2.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi'
       Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
       Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
+      New-NetFirewallRule -DisplayName "WSL" -Direction Inbound -InterfaceAlias "vEthernet (WSL)" -Action Allow
       '@
 
       # Write startup powershell script to file. 
