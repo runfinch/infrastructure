@@ -4,10 +4,8 @@ and send notifications to Finch team regarding security notifications.
 '''
 import boto3
 import os
-from aws_lambda_powertools.utilities.data_classes import EventBridgeEvent
-from aws_lambda_powertools.utilities.typing import LambdaContext
 
-def build_message(event: EventBridgeEvent):
+def build_message(event):
     '''build_message reads an {event} from Inspector image scanning and builds 
     the body of reporting email with vulnerability findings.
 
@@ -50,7 +48,12 @@ def send_sns(subject: str, message: str):
     topic_arn = os.environ["SNS_ARN"]
     client.publish(TopicArn=topic_arn, Message=message, Subject=subject)
 
-def lambda_handler(event: EventBridgeEvent, context: LambdaContext) -> dict:
+def lambda_handler(event, context) -> dict:
+    '''lambda_handler handles EventBridge events, calling send_sns to send an email for security findings.
+    
+    :param EventBridgeEvent event: the EventBridge event
+    :param LambdaContext context: the Lambda execution context
+    '''
     detailType = event["detail-type"]
     
     if (detailType == "Inspector2 Finding"):
