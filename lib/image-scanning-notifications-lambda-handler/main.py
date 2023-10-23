@@ -44,7 +44,7 @@ def send_sns(subject: str, message: str):
     :param str subject: The subject of the email
     :param str message: The body of the email
     '''
-    client = boto3.client("sns", region="us-west-2")
+    client = boto3.client("sns")
     topic_arn = os.environ["SNS_ARN"]
     client.publish(TopicArn=topic_arn, Message=message, Subject=subject)
 
