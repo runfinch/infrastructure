@@ -35,20 +35,6 @@ tasks:
 
       New-Item -Path $Home\setup -ItemType Directory
       Set-Location $Home\setup
-
-      Write-Information "Installing winget and its dependencies..."
-
-      Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
-      Invoke-WebRequest -Uri https://www.nuget.org/api/v2/package/Microsoft.UI.Xaml/2.7.3 -OutFile .\microsoft.ui.xaml.2.7.3.zip
-      Expand-Archive .\microsoft.ui.xaml.2.7.3.zip
-      Add-AppxPackage .\microsoft.ui.xaml.2.7.3\tools\AppX\x64\Release\Microsoft.UI.Xaml.2.7.appx
-
-      Invoke-WebRequest -Uri https://github.com/microsoft/terminal/releases/download/v1.17.11461.0/Microsoft.WindowsTerminal_1.17.11461.0_8wekyb3d8bbwe.msixbundle -OutFile .\Microsoft.WindowsTerminal_1.17.11461.0_8wekyb3d8bbwe.msixbundle
-      Add-AppxProvisionedPackage -Online -PackagePath .\Microsoft.WindowsTerminal_1.17.11461.0_8wekyb3d8bbwe.msixbundle -SkipLicense
-      Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.WindowsTerminal_1.17.11461.0_8wekyb3d8bbwe
-
-      # Install latest NuGet
-      Install-PackageProvider -Name NuGet -Force
     
       Write-Information "Install dependencies git, make, go, AWS tools, and update path..."
       $pws7script = @'
@@ -120,8 +106,8 @@ tasks:
       $ServiceName=(Get-Service actions.runner.*).name
       $startupscript = @'
       Start-Transcript -Path "C:\StartupScript.log" -Append
-      Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.0.2/wsl.2.0.2.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi'
-      Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.0.2.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
+      Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.0.7/wsl.2.0.7.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.0.7.0.x64.msi'
+      Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.0.7.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
       Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
       Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu'
       sleep 30 # sleep to allow Ubuntu VM to start
