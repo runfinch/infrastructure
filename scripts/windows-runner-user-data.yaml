@@ -36,7 +36,11 @@ tasks:
       New-Item -Path $Home\setup -ItemType Directory
       Set-Location $Home\setup
     
-      Write-Information "Install dependencies git, make, go, AWS tools, and update path..."
+      Write-Information "Install dependencies git, make, go, AWS tools, NuGet and update path..."
+
+      # Install latest NuGet so that Carbon installation works later
+      Install-PackageProvider -Name NuGet -Force
+
       $pws7script = @'
       Start-Transcript -Path "$Home\setup\setup7.log" -Append
       Import-Module -Name Appx -UseWindowsPowerShell  
