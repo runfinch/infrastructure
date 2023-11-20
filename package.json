@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@types/jest": "^27.5.2",
-    "@types/node": "20.8.10",
+    "@types/node": "20.9.2",
     "@types/node-fetch": "^2.6.2",
     "@types/prettier": "3.0.0",
     "aws-cdk": "2.104.0",
