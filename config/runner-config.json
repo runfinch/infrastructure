@@ -1,228 +1,228 @@
 {
-    "runnerBeta": {
-        "macLicenseArn": "arn:aws:license-manager:us-west-2:820462304213:license-configuration:lic-7ac3e249bd13f71b44ac34963a8c3353",
-        "windowsLicenseArn": "arn:aws:license-manager:us-west-2:820462304213:license-configuration:lic-56c55a611976d66a1357e58077b19e93",
-        "runnerTypes": [
-            {
-                "platform": "mac",
-                "version": "13.2",
-                "arch": "arm",
-                "repo": "finch",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"] 
-            },
-            {
-                "platform": "mac",
-                "version": "13.2",
-                "arch": "x86",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
-            },
-            {
-                "platform": "windows",
-                "version": "2022",
-                "arch": "x86",
-                "repo": "finch",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"] 
-            },
-            {
-                "platform": "windows",
-                "version": "2022",
-                "arch": "x86",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"] 
-            }
-        ]
-    },
-    "runnerProd": {
-        "macLicenseArn": "arn:aws:license-manager:us-west-2:090529234398:license-configuration:lic-c0c3e2458f6d2a45b0bcc8d66fbc072e",
-        "windowsLicenseArn": "arn:aws:license-manager:us-west-2:090529234398:license-configuration:lic-62c55a61d2d9ce6ef100c6ea267216e6",
-        "runnerTypes": [
-            {
-                "platform": "mac",
-                "version": "13.2",
-                "arch": "arm",
-                "repo": "finch",
-                "desiredInstances": 2,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"] 
-            },
-            {
-                "platform": "mac",
-                "version": "13.2",
-                "arch": "x86",
-                "repo": "finch",
-                "desiredInstances": 2,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
-            },
-            {
-                "platform": "mac",
-                "version": "12.6",
-                "arch": "arm",
-                "repo": "finch",
-                "desiredInstances": 2,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"] 
-            },
-            {
-                "platform": "mac",
-                "version": "12.6",
-                "arch": "x86",
-                "repo": "finch",
-                "desiredInstances": 2,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
-            },
-            {
-                "platform": "mac",
-                "version": "13.2",
-                "arch": "arm",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"] 
-            },
-            {
-                "platform": "mac",
-                "version": "13.2",
-                "arch": "x86",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
-            },
-            {
-                "platform": "mac",
-                "version": "12.6",
-                "arch": "arm",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"] 
-            },
-            {
-                "platform": "mac",
-                "version": "12.6",
-                "arch": "x86",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
-            },
-            {
-                "platform": "windows",
-                "version": "2022",
-                "arch": "x86",
-                "repo": "finch",
-                "desiredInstances": 2,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"] 
-            },
-            {
-                "platform": "windows",
-                "version": "2022",
-                "arch": "x86",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"] 
-            }
-        ]
-    },
-    "runnerRelease": {
-        "macLicenseArn": "arn:aws:license-manager:us-east-2:019528120233:license-configuration:lic-94c3e244cb74a70c90c82f432e9e0d91",
-        "windowsLicenseArn": "arn:aws:license-manager:us-east-2:019528120233:license-configuration:lic-2ec55a6280292474f1ea0d7ad6f64987",
-        "runnerTypes": [
-            {
-                "platform": "mac",
-                "version": "13.2",
-                "arch": "arm",
-                "repo": "finch",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"] 
-            },
-            {
-                "platform": "mac",
-                "version": "13.2",
-                "arch": "x86",
-                "repo": "finch",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"] 
-            },
-            {
-                "platform": "mac",
-                "version": "12.6",
-                "arch": "arm",
-                "repo": "finch",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"] 
-            },
-            {
-                "platform": "mac",
-                "version": "12.6",
-                "arch": "x86",
-                "repo": "finch",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"] 
-            },
-            {
-                "platform": "mac",
-                "version": "11.7",
-                "arch": "arm",
-                "repo": "finch",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"] 
-            },
-            {
-                "platform": "mac",
-                "version": "11.7",
-                "arch": "x86",
-                "repo": "finch",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
-            },
-            {
-                "platform": "mac",
-                "version": "13.2",
-                "arch": "arm",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"] 
-            },
-            {
-                "platform": "mac",
-                "version": "13.2",
-                "arch": "x86",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"] 
-            },
-            {
-                "platform": "mac",
-                "version": "11.7",
-                "arch": "arm",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"] 
-            },
-            {
-                "platform": "mac",
-                "version": "11.7",
-                "arch": "x86",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
-            },
-            {
-                "platform": "windows",
-                "version": "2022",
-                "arch": "x86",
-                "repo": "finch",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
-            },
-            {
-                "platform": "windows",
-                "version": "2022",
-                "arch": "x86",
-                "repo": "finch-core",
-                "desiredInstances": 1,
-                "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
-            }
-        ]
-    }
+  "runnerBeta": {
+    "macLicenseArn": "arn:aws:license-manager:us-west-2:820462304213:license-configuration:lic-7ac3e249bd13f71b44ac34963a8c3353",
+    "windowsLicenseArn": "arn:aws:license-manager:us-west-2:820462304213:license-configuration:lic-56c55a611976d66a1357e58077b19e93",
+    "runnerTypes": [
+      {
+        "platform": "mac",
+        "version": "13.2",
+        "arch": "arm",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "mac",
+        "version": "13.2",
+        "arch": "x86",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "windows",
+        "version": "2022",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "windows",
+        "version": "2022",
+        "arch": "x86",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      }
+    ]
+  },
+  "runnerProd": {
+    "macLicenseArn": "arn:aws:license-manager:us-west-2:090529234398:license-configuration:lic-c0c3e2458f6d2a45b0bcc8d66fbc072e",
+    "windowsLicenseArn": "arn:aws:license-manager:us-west-2:090529234398:license-configuration:lic-62c55a61d2d9ce6ef100c6ea267216e6",
+    "runnerTypes": [
+      {
+        "platform": "mac",
+        "version": "13.2",
+        "arch": "arm",
+        "repo": "finch",
+        "desiredInstances": 2,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "mac",
+        "version": "13.2",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 2,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "mac",
+        "version": "14.1",
+        "arch": "arm",
+        "repo": "finch",
+        "desiredInstances": 2,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "mac",
+        "version": "14.1",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 2,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "mac",
+        "version": "13.2",
+        "arch": "arm",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "mac",
+        "version": "13.2",
+        "arch": "x86",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "mac",
+        "version": "14.1",
+        "arch": "arm",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "mac",
+        "version": "14.1",
+        "arch": "x86",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "windows",
+        "version": "2022",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 2,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      },
+      {
+        "platform": "windows",
+        "version": "2022",
+        "arch": "x86",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      }
+    ]
+  },
+  "runnerRelease": {
+    "macLicenseArn": "arn:aws:license-manager:us-east-2:019528120233:license-configuration:lic-94c3e244cb74a70c90c82f432e9e0d91",
+    "windowsLicenseArn": "arn:aws:license-manager:us-east-2:019528120233:license-configuration:lic-2ec55a6280292474f1ea0d7ad6f64987",
+    "runnerTypes": [
+      {
+        "platform": "mac",
+        "version": "13.2",
+        "arch": "arm",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "13.2",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "14.1",
+        "arch": "arm",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "14.1",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "11.7",
+        "arch": "arm",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "11.7",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "13.2",
+        "arch": "arm",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "13.2",
+        "arch": "x86",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "11.7",
+        "arch": "arm",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "11.7",
+        "arch": "x86",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "windows",
+        "version": "2022",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "windows",
+        "version": "2022",
+        "arch": "x86",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      }
+    ]
+  }
 }
