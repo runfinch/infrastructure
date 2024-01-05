@@ -110,8 +110,11 @@ tasks:
       $ServiceName=(Get-Service actions.runner.*).name
       $startupscript = @'
       Start-Transcript -Path "C:\StartupScript.log" -Append
-      Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.0.7/wsl.2.0.7.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.0.7.0.x64.msi'
-      Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.0.7.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
+      Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.0.15/wsl.2.0.15.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.0.15.0.x64.msi'
+      Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.0.15.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
+      # Update the WSL kernel
+      Invoke-WebRequest -Uri 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl_update_x64.msi'
+      Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl_update_x64.msi /L*V C:\WSLInstallation.log /quiet'
       Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
       Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu'
       sleep 30 # sleep to allow Ubuntu VM to start
