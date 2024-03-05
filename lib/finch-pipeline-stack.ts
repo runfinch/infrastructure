@@ -1,10 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
-import { FinchPipelineAppStage } from './finch-pipeline-app-stage';
-import { ENVIRONMENT_STAGE } from './finch-pipeline-app-stage';
+import { Construct } from 'constructs';
 import { EnvConfig } from '../config/env-config';
 import { RunnerConfig } from '../config/runner-config';
+import { ENVIRONMENT_STAGE, FinchPipelineAppStage } from './finch-pipeline-app-stage';
 
 export class FinchPipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -20,7 +20,18 @@ export class FinchPipelineStack extends cdk.Stack {
       synth: new ShellStep('Synth', {
         input: source,
         commands: ['npm ci', 'npm run build', 'npx cdk synth']
-      })
+      }),
+      synthCodeBuildDefaults: {
+        partialBuildSpec: BuildSpec.fromObject({
+          phases: {
+            install: {
+              'runtime-versions': {
+                nodejs: '20'
+              }
+            }
+          }
+        })
+      }
     });
 
     const betaApp = new FinchPipelineAppStage(this, 'Beta', {
