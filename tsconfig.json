@@ -1,17 +1,7 @@
 {
+  "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
-    "target": "ES2018",
-    "module": "CommonJS",
-    "esModuleInterop":true,
-    "lib": [
-      "es2018"
-    ],
     "declaration": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitReturns": true,
@@ -20,9 +10,6 @@
     "inlineSources": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
-    "typeRoots": [
-      "./node_modules/@types"
-    ],
     "resolveJsonModule": true,
   },
   "exclude": [

@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 describe('Integration test', () => {
   test('200 Response from CloudFront Distribution', async () => {
     const url = process.env.CLOUDFRONT_URL ? `https://${process.env.CLOUDFRONT_URL}/test.html` : 'No URL in env';
