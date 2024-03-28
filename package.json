@@ -13,7 +13,7 @@
     "prettier-format": "prettier --config .prettierrc --write 'lib/*.ts' 'bin/*.ts' 'test/*.ts' 'integration_test/*.ts' 'config/*.ts'"
   },
   "devDependencies": {
-    "@tsconfig/node18": "^18.2.2",
+    "@tsconfig/node18": "^18.2.4",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.30",
     "@types/prettier": "3.0.0",
