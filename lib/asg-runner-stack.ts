@@ -1,13 +1,13 @@
 import * as cdk from 'aws-cdk-lib';
+import { aws_autoscaling as autoscaling } from 'aws-cdk-lib';
+import { UpdatePolicy } from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as resourcegroups from 'aws-cdk-lib/aws-resourcegroups';
-import { aws_autoscaling as autoscaling } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { PlatformType, RunnerType } from '../config/runner-config';
 import { readFileSync } from 'fs';
+import { PlatformType, RunnerType } from '../config/runner-config';
 import { ENVIRONMENT_STAGE } from './finch-pipeline-app-stage';
-import { UpdatePolicy } from 'aws-cdk-lib/aws-autoscaling';
 
 interface ASGRunnerStackProps extends cdk.StackProps {
   env: cdk.Environment | undefined;
@@ -143,11 +143,14 @@ export class ASGRunnerStack extends cdk.Stack {
     // Create a 100GiB volume to be used as instance root volume
     const rootVolume: ec2.BlockDevice = {
       deviceName: '/dev/sda1',
-      volume: ec2.BlockDeviceVolume.ebs(100),
+      volume: ec2.BlockDeviceVolume.ebs(100, {
+        volumeType: ec2.EbsDeviceVolumeType.IO2,
+        iops: 32000
+      })
     };
 
     const asgName = platform === PlatformType.WINDOWS ? 'WindowsASG' : 'MacASG';
-    const ltName = `${asgName}LaunchTemplate`
+    const ltName = `${asgName}LaunchTemplate`;
     const lt = new ec2.LaunchTemplate(this, ltName, {
       requireImdsv2: true,
       instanceType: new ec2.InstanceType(instanceType),
@@ -205,9 +208,9 @@ export class ASGRunnerStack extends cdk.Stack {
           autoscaling.ScalingProcess.REPLACE_UNHEALTHY,
           autoscaling.ScalingProcess.AZ_REBALANCE,
           autoscaling.ScalingProcess.ALARM_NOTIFICATION,
-          autoscaling.ScalingProcess.SCHEDULED_ACTIONS,
+          autoscaling.ScalingProcess.SCHEDULED_ACTIONS
         ],
-        waitOnResourceSignals: false,
+        waitOnResourceSignals: false
       })
     });
 
