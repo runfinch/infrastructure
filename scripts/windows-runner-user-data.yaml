@@ -1,158 +1,162 @@
 # windows-runner-user-data.yaml
-# 
+#
 # User Script for launching a Windows EC2 instance that:
 #  - logs to C:\UserData.log
-#  - installs winget, git, Make, AWS tools, and latest powershell
+#  - installs git, Make, AWS tools, latest powershell, Nuget, yq and Carbon
 #  - installs WSL2 and its dependencies
 #    * reboots the instance to apply the installation
 #  - periodically updates WSL2
 #  - registers as a self-hosted GitHub Actions runner on instance startup
 version: 1.0
 tasks:
-- task: executeScript
-  inputs:
-  - frequency: once
-    type: powershell
-    runAs: admin
-    content: |-
-      Start-Transcript -Path "C:\UserData.log" -Append
-      $progressPreference = 'silentlyContinue'
-      $RUNNER_DIR="C:\actions-runner"
+  - task: executeScript
+    inputs:
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          Start-Transcript -Path "C:\UserData.log" -Append
+          $progressPreference = 'silentlyContinue'
+          $RUNNER_DIR="C:\actions-runner"
 
-      # "<name>" values set in lib/asg-runner-stack.ts
-      $LABEL_ARCH="amd64"
-      $LABEL_STAGE="<STAGE>"
-      $REPO="<REPO>"
-      $REGION="<REGION>"
+          # "<name>" values set in lib/asg-runner-stack.ts
+          $LABEL_ARCH="amd64"
+          $LABEL_STAGE="<STAGE>"
+          $REPO="<REPO>"
+          $REGION="<REGION>"
 
-      Write-Information "Installing latest powershell7 version..."
-      Invoke-Expression "& { $(Invoke-RestMethod 'https://aka.ms/install-powershell.ps1') } -useMSI -EnablePSRemoting -Quiet"
+          Write-Information "Installing latest powershell7 version..."
+          Invoke-Expression "& { $(Invoke-RestMethod 'https://aka.ms/install-powershell.ps1') } -useMSI -EnablePSRemoting -Quiet"
 
-      New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value "C:\Program Files\PowerShell\7\pwsh.exe" -PropertyType String -Force
+          New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value "C:\Program Files\PowerShell\7\pwsh.exe" -PropertyType String -Force
 
-      New-Item -Path $Profile -ItemType File -Force 
-      'Set-PSReadLineOption -EditMode Emacs' | Out-File -Append $Profile
+          New-Item -Path $Profile -ItemType File -Force 
+          'Set-PSReadLineOption -EditMode Emacs' | Out-File -Append $Profile
 
-      New-Item -Path $Home\setup -ItemType Directory
-      Set-Location $Home\setup
-    
-      Write-Information "Install dependencies git, make, go, AWS tools, NuGet and update path..."
+          New-Item -Path $Home\setup -ItemType Directory
+          New-Item -Path $Home\setup\bin -ItemType Directory
+          Set-Location $Home\setup
 
-      # Install latest NuGet so that Carbon installation works later
-      Install-PackageProvider -Name NuGet -Force
+          Write-Information "Install dependencies git, make, go, AWS tools, NuGet and update path..."
 
-      $pws7script = @'
-      Start-Transcript -Path "$Home\setup\setup7.log" -Append
-      Import-Module -Name Appx -UseWindowsPowerShell  
+          # Install latest NuGet so that Carbon installation works later
+          Install-PackageProvider -Name NuGet -Force
 
-      # Install git and Make
-      Invoke-WebRequest -Uri 'https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.2/Git-2.42.0.2-64-bit.exe' -OutFile 'git-2.42.0.exe'
-      .\git-2.42.0.exe /SILENT
-      # use curl to follow redirects
-      & "C:\Windows\System32\curl.exe" -L https://sourceforge.net/projects/gnuwin32/files/make/3.81/make-3.81.exe/download -o make.exe
-      .\make.exe /SILENT
+          $pws7script = @'
+          Start-Transcript -Path "$Home\setup\setup7.log" -Append
+          Import-Module -Name Appx -UseWindowsPowerShell
 
-      # Install AWS tools
-      Install-Module -Name AWS.Tools.Common -Force
-      Install-Module -Name AWS.Tools.SecretsManager -Force
-      Install-Module -Name AWS.Tools.EC2 -Force
-      Install-Module -Name AWS.Tools.AutoScaling -Force
+          # Install git and Make
+          Invoke-WebRequest -Uri 'https://github.com/git-for-windows/git/releases/download/v2.44.0.windows.1/Git-2.44.0-64-bit.exe' -OutFile 'git-2.44.0.exe'
+          .\git-2.44.0.exe /SILENT
+          # use curl to follow redirects
+          & "C:\Windows\System32\curl.exe" -L https://sourceforge.net/projects/gnuwin32/files/make/3.81/make-3.81.exe/download -o make.exe
+          .\make.exe /SILENT
 
-      #  Install Go
-      Invoke-WebRequest -Uri 'https://go.dev/dl/go1.21.0.windows-amd64.msi' -OutFile 'go1.21.0.windows-amd64.msi'
-      Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Users\Administrator\setup\go1.21.0.windows-amd64.msi /quiet'
+          # Install AWS tools
+          Install-Module -Name AWS.Tools.Common -Force
+          Install-Module -Name AWS.Tools.SecretsManager -Force
+          Install-Module -Name AWS.Tools.EC2 -Force
+          Install-Module -Name AWS.Tools.AutoScaling -Force
 
-      # Configure path; include path to pre release WSL
-      $newPath = ("C:\Program Files\Git\usr\bin\;" + "C:\Program Files\WSL\;" + "$env:Path" + ";C:\Program Files\Git\bin\;" + "C:\Program Files (x86)\GnuWin32\bin\;" + "C:\Program Files\Go\bin\;")
-      $env:Path = $newPath
-      # Persist the path to the registry for new shells
-      Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value $newPath
-      '@
-    
-      # Write PowerShell 7 script to file
-      $pws7script | Out-File $Home\setup\setup7.ps1
-    
-      # Execute script with PowerShell 7
-      Write-Information "Running setup7.ps1..."
-      $ConsoleCommand = "$Home\setup\setup7.ps1"
-      Start-Process "C:\Program Files\PowerShell\7\pwsh" -Wait -NoNewWindow -PassThru -ArgumentList "-Command  &{ $ConsoleCommand }"
+          # Install Go
+          Invoke-WebRequest -Uri 'https://go.dev/dl/go1.22.2.windows-amd64.msi' -OutFile 'go1.22.2.windows-amd64.msi'
+          Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Users\Administrator\setup\go1.22.2.windows-amd64.msi /quiet'
 
-      Write-Information "Downloading and configuring GitHub Actions Runner..."
-      mkdir $RUNNER_DIR; cd $RUNNER_DIR
-      Invoke-WebRequest -Uri https://github.com/actions/runner/releases/download/v2.309.0/actions-runner-win-x64-2.309.0.zip -OutFile actions-runner-win-x64-2.309.0.zip
-      if((Get-FileHash -Path actions-runner-win-x64-2.309.0.zip -Algorithm SHA256).Hash.ToUpper() -ne 'cd1920154e365689130aa1f90258e0da47faecce547d0374475cdd2554dbf09a'.ToUpper()){ throw 'Computed checksum did not match' }
-      Add-Type -AssemblyName System.IO.Compression.FileSystem ;  [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD/actions-runner-win-x64-2.309.0.zip", "$PWD")
+          # Install yq
+          Invoke-WebRequest -Uri 'https://github.com/mikefarah/yq/releases/download/v4.43.1/yq_windows_amd64.exe' -OutFile '.\bin\yq.exe'
 
-      $GH_KEY=(Get-SECSecretValue -SecretId $REPO-runner-reg-key -Region $REGION).SecretString
-      $LABEL_OS_VER=$([System.Environment]::OSVersion.Version.Major)
-      $LABEL_BUILD_VER=$([System.Environment]::OSVersion.Version.Build)
+          # Configure path; include path to pre release WSL
+          $newPath = ("C:\Program Files\Git\usr\bin\;" + "C:\Program Files\WSL\;" + "$env:Path" + ";C:\Program Files\Git\bin\;" + "C:\Program Files (x86)\GnuWin32\bin\;" + "C:\Program Files\Go\bin\;" + "$Home\setup\bin\;")
+          $env:Path = $newPath
+          # Persist the path to the registry for new shells
+          Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value $newPath
+          '@
 
-      $RUNNER_REG_TOKEN=((Invoke-WebRequest -UseBasicParsing -Method POST -Headers @{"Accept" = "application/vnd.github+json"; "Authorization" =  "Bearer $GH_KEY";  "X-GitHub-Api-Version" = "2022-11-28"} -Uri https://api.github.com/repos/runfinch/$REPO/actions/runners/registration-token).Content | ConvertFrom-Json).token
+          # Write PowerShell 7 script to file
+          $pws7script | Out-File $Home\setup\setup7.ps1
 
-      Write-Information "Starting GitHub Actions Runner..."
-      cd $RUNNER_DIR; ./config.cmd --url https://github.com/runfinch/$REPO --unattended --runasservice --token  $RUNNER_REG_TOKEN --work _work --labels $LABEL_ARCH,$LABEL_OS_VER,$LABEL_BUILD_VER,$LABEL_STAGE
+          # Execute script with PowerShell 7
+          Write-Information "Running setup7.ps1..."
+          $ConsoleCommand = "$Home\setup\setup7.ps1"
+          Start-Process "C:\Program Files\PowerShell\7\pwsh" -Wait -NoNewWindow -PassThru -ArgumentList "-Command  &{ $ConsoleCommand }"
 
-      # To install WSL2, the instance must be rebooted: https://learn.microsoft.com/en-us/windows/wsl/install
-      # To accomplish this while not replacing the instance in the autoscaling group,
-      #
-      # 1. Put the instance in "StandBy" mode
-      # 2. Register a powershell script to be run at instance reboot on login
-      # 3. Install WSL2 and restart the instance
+          Write-Information "Downloading and configuring GitHub Actions Runner..."
+          mkdir $RUNNER_DIR; cd $RUNNER_DIR
+          Invoke-WebRequest -Uri https://github.com/actions/runner/releases/download/v2.316.0/actions-runner-win-x64-2.316.0.zip -OutFile actions-runner-win-x64-2.316.0.zip
+          if((Get-FileHash -Path actions-runner-win-x64-2.316.0.zip -Algorithm SHA256).Hash.ToUpper() -ne '9b2d0443d11ce5c2c4391d708576dc37b1ecf62edcceec7c0c9c8e6b4472b5a1'.ToUpper()){ throw 'Computed checksum did not match' }
+          Add-Type -AssemblyName System.IO.Compression.FileSystem ;  [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD/actions-runner-win-x64-2.316.0.zip", "$PWD")
 
-      Write-Information "Entering StandBy..."
-      $InstanceId=(Get-EC2InstanceMetadata -Category InstanceId)
-      $ASGName=(Get-ASAutoScalingInstance -InstanceId $InstanceId).AutoScalingGroupName
-      Enter-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId -ShouldDecrementDesiredCapacity $true
+          $GH_KEY=(Get-SECSecretValue -SecretId $REPO-runner-reg-key -Region $REGION).SecretString
+          $LABEL_OS_VER=$([System.Environment]::OSVersion.Version.Major)
+          $LABEL_BUILD_VER=$([System.Environment]::OSVersion.Version.Build)
 
-      # Script runs on login after reboot to start GitHub Actions service, put the instance InService in the ASG,
-      # and update wsl version to pre-release verion such that ssh / session 0 connections can call wsl
-      # Allow inbound connections on vEthernet interface for traffic from wsl to host
-      $ServiceName=(Get-Service actions.runner.*).name
-      $startupscript = @'
-      Start-Transcript -Path "C:\StartupScript.log" -Append
-      Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.0.15/wsl.2.0.15.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.0.15.0.x64.msi'
-      Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.0.15.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
-      # Update the WSL kernel
-      Invoke-WebRequest -Uri 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl_update_x64.msi'
-      Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl_update_x64.msi /L*V C:\WSLInstallation.log /quiet'
-      Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
-      Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu'
-      sleep 30 # sleep to allow Ubuntu VM to start
-      New-NetFirewallRule -DisplayName "WSL" -Direction Inbound -InterfaceAlias "vEthernet (WSL)" -Action Allow
-      '@
+          $RUNNER_REG_TOKEN=((Invoke-WebRequest -UseBasicParsing -Method POST -Headers @{"Accept" = "application/vnd.github+json"; "Authorization" =  "Bearer $GH_KEY";  "X-GitHub-Api-Version" = "2022-11-28"} -Uri https://api.github.com/repos/runfinch/$REPO/actions/runners/registration-token).Content | ConvertFrom-Json).token
 
-      # Write startup powershell script to file. 
-      # $ExecutionContext.InvokeCommand.ExpandString will evaluate variables first, so the ASG and instance ID are specified
-      Set-Content 'C:\startup.ps1' ($ExecutionContext.InvokeCommand.ExpandString($startupscript))
+          Write-Information "Starting GitHub Actions Runner..."
+          cd $RUNNER_DIR; ./config.cmd --url https://github.com/runfinch/$REPO --unattended --runasservice --token  $RUNNER_REG_TOKEN --work _work --labels $LABEL_ARCH,$LABEL_OS_VER,$LABEL_BUILD_VER,$LABEL_STAGE
 
-      # Register a scheduled job to run the script to regist the instance as a runner on boot.
-      $trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
-      Register-ScheduledJob -Trigger $trigger -FilePath C:\startup.ps1 -Name startup-job-inservice
+          # To install WSL2, the instance must be rebooted: https://learn.microsoft.com/en-us/windows/wsl/install
+          # To accomplish this while not replacing the instance in the autoscaling group,
+          #
+          # 1. Put the instance in "StandBy" mode
+          # 2. Register a powershell script to be run at instance reboot on login
+          # 3. Install WSL2 and restart the instance
 
-      # Register a scheduled job to attempt a WSL update every day between 10:00am and 10:20am.
-      $trigger = New-JobTrigger -Daily -At 10:00 -RandomDelay 00:20:00
-      Register-ScheduledJob -Trigger $trigger -Name auto-update-wsl2 -ScriptBlock {
-        wsl --update --pre-release
-      }
+          Write-Information "Entering StandBy..."
+          $InstanceId=(Get-EC2InstanceMetadata -Category InstanceId)
+          $ASGName=(Get-ASAutoScalingInstance -InstanceId $InstanceId).AutoScalingGroupName
+          Enter-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId -ShouldDecrementDesiredCapacity $true
 
-      Write-Information "Changing GHA service ownership to Administrator..."
-      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-      Install-Module -Name 'Carbon' -AllowClobber -Force
-      # Configure the GitHub Actions runner service to log on as Administrator; grant the Administrator
-      # user "Log on as a Service" privileges via Carbon module:
-      # https://get-carbon.org/Grant-Privilege.html
-      Stop-Service "actions.runner.*"
-      Grant-CPrivilege -Identity "Administrator" "SeServiceLogonRight"
+          # Script runs on login after reboot to start GitHub Actions service, put the instance InService in the ASG,
+          # and update wsl version to pre-release verion such that ssh / session 0 connections can call wsl
+          # Allow inbound connections on vEthernet interface for traffic from wsl to host
+          $ServiceName=(Get-Service actions.runner.*).name
+          $startupscript = @'
+          Start-Transcript -Path "C:\StartupScript.log" -Append
+          Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.2.4/wsl.2.2.4.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.2.4.0.x64.msi'
+          Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.2.4.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
+          # Update the WSL kernel
+          Invoke-WebRequest -Uri 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl_update_x64.msi'
+          Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl_update_x64.msi /L*V C:\WSLInstallation.log /quiet'
+          Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
+          Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu'
+          sleep 30 # sleep to allow Ubuntu VM to start
+          New-NetFirewallRule -DisplayName "WSL" -Direction Inbound -InterfaceAlias "vEthernet (WSL)" -Action Allow
+          '@
 
-      net user Administrator "$GH_KEY"
+          # Write startup powershell script to file. 
+          # $ExecutionContext.InvokeCommand.ExpandString will evaluate variables first, so the ASG and instance ID are specified
+          Set-Content 'C:\startup.ps1' ($ExecutionContext.InvokeCommand.ExpandString($startupscript))
 
-      Write-Information "starting GHA service..."
-      Set-Service -Name $ServiceName -StartupType Automatic
-      Start-Service "actions.runner.*"
+          # Register a scheduled job to run the script to regist the instance as a runner on boot.
+          $trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
+          Register-ScheduledJob -Trigger $trigger -FilePath C:\startup.ps1 -Name startup-job-inservice
 
-      Invoke-Expression "cmd.exe /c sc config $ServiceName obj= '$(hostname)\Administrator' password= '$GH_KEY' type= own"
+          # Register a scheduled job to attempt a WSL update every day between 10:00am and 10:20am.
+          $trigger = New-JobTrigger -Daily -At 10:00 -RandomDelay 00:20:00
+          Register-ScheduledJob -Trigger $trigger -Name auto-update-wsl2 -ScriptBlock {
+            wsl --update --pre-release
+          }
 
-      wsl --install
+          Write-Information "Changing GHA service ownership to Administrator..."
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          Install-Module -Name 'Carbon' -AllowClobber -Force
+          # Configure the GitHub Actions runner service to log on as Administrator; grant the Administrator
+          # user "Log on as a Service" privileges via Carbon module:
+          # https://get-carbon.org/Grant-Privilege.html
+          Stop-Service "actions.runner.*"
+          Grant-CPrivilege -Identity "Administrator" "SeServiceLogonRight"
 
-      Write-Information "Restarting instance..."
-      Restart-Computer
+          net user Administrator "$GH_KEY"
+
+          Write-Information "starting GHA service..."
+          Set-Service -Name $ServiceName -StartupType Automatic
+          Start-Service "actions.runner.*"
+
+          Invoke-Expression "cmd.exe /c sc config $ServiceName obj= '$(hostname)\Administrator' password= '$GH_KEY' type= own"
+
+          wsl --install
+
+          Write-Information "Restarting instance..."
+          Restart-Computer
