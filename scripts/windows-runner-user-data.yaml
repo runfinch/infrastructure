@@ -133,12 +133,6 @@ tasks:
           $trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
           Register-ScheduledJob -Trigger $trigger -FilePath C:\startup.ps1 -Name startup-job-inservice
 
-          # Register a scheduled job to attempt a WSL update every day between 10:00am and 10:20am.
-          $trigger = New-JobTrigger -Daily -At 10:00 -RandomDelay 00:20:00
-          Register-ScheduledJob -Trigger $trigger -Name auto-update-wsl2 -ScriptBlock {
-            wsl --update --pre-release
-          }
-
           Write-Information "Changing GHA service ownership to Administrator..."
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
           Install-Module -Name 'Carbon' -AllowClobber -Force
