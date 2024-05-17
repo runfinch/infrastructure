@@ -5,6 +5,6 @@ import { FinchPipelineStack } from '../lib/finch-pipeline-stack';
 import { EnvConfig } from '../config/env-config';
 
 const app = new cdk.App();
-new FinchPipelineStack(app, 'FinchPipelineStack', { env: EnvConfig.envPipeline });
+new FinchPipelineStack(app, 'FinchPipelineStack', { env: EnvConfig.envPipeline, terminationProtection: true });
 
 app.synth();
