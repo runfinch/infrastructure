@@ -68,10 +68,10 @@ export class FinchPipelineAppStage extends cdk.Stage {
         this, 
         'FinchContinuousIntegrationStack', 
         this.stageName, 
-        {rootfsEcrRepository: this.ecrRepository}
+        { rootfsEcrRepository: this.ecrRepository }
       );
     }
 
-    new PVREReportingStack(this, 'PVREReportingStack');
+    new PVREReportingStack(this, 'PVREReportingStack', { terminationProtection:true });
   }
 }

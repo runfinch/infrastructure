@@ -57,5 +57,7 @@ describe('FinchPipelineStack', () => {
         'Fn::GetAtt': ['FinchPipelineRole198D7E07', 'Arn']
       }
     });
+
+    expect(stack.terminationProtection).toBeTruthy();
   });
 });

@@ -5,10 +5,12 @@ import { Construct } from 'constructs';
 import { EnvConfig } from '../config/env-config';
 import { RunnerConfig } from '../config/runner-config';
 import { ENVIRONMENT_STAGE, FinchPipelineAppStage } from './finch-pipeline-app-stage';
+import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
 
 export class FinchPipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+    applyTerminationProtectionOnStacks([this]);
 
     const source = CodePipelineSource.gitHub('runfinch/infrastructure', 'main', {
       authentication: cdk.SecretValue.secretsManager('pipeline-github-access-token')

@@ -8,6 +8,7 @@ import { PlatformType, RunnerType } from '../config/runner-config';
 import { readFileSync } from 'fs';
 import { ENVIRONMENT_STAGE } from './finch-pipeline-app-stage';
 import { UpdatePolicy } from 'aws-cdk-lib/aws-autoscaling';
+import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
 
 interface ASGRunnerStackProps extends cdk.StackProps {
   env: cdk.Environment | undefined;
@@ -26,6 +27,7 @@ interface ASGRunnerStackProps extends cdk.StackProps {
 export class ASGRunnerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ASGRunnerStackProps) {
     super(scope, id, props);
+    applyTerminationProtectionOnStacks([this]);
 
     const platform = props.type.platform;
     const arch = props.type.arch === 'arm' ? `arm64_${platform}` : `x86_64_${platform}`;

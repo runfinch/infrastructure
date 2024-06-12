@@ -5,6 +5,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
 import { CloudfrontCdn } from './cloudfront_cdn';
+import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
 
 interface ContinuousIntegrationStackProps extends cdk.StackProps {
   rootfsEcrRepository: ecr.Repository;
@@ -14,6 +15,7 @@ interface ContinuousIntegrationStackProps extends cdk.StackProps {
 export class ContinuousIntegrationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, stage: string, props: ContinuousIntegrationStackProps) {
     super(scope, id, props);
+    applyTerminationProtectionOnStacks([this]);
 
     const githubDomain = 'token.actions.githubusercontent.com';
 

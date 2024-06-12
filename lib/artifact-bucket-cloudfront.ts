@@ -5,12 +5,15 @@ import { Construct } from 'constructs';
 
 import { CloudfrontCdn } from './cloudfront_cdn';
 import * as s3Deployment from 'aws-cdk-lib/aws-s3-deployment';
+import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
 
 export class ArtifactBucketCloudfrontStack extends cdk.Stack {
   public readonly urlOutput: CfnOutput;
   public readonly bucket: s3.Bucket;
   constructor(scope: Construct, id: string, stage: string, props?: cdk.StackProps) {
     super(scope, id, props);
+    applyTerminationProtectionOnStacks([this]);
+
     const bucketName = `finch-artifact-bucket-${stage.toLowerCase()}-${cdk.Stack.of(this)?.account}`;
     const artifactBucket = new s3.Bucket(this, 'ArtifactBucket', {
       bucketName,

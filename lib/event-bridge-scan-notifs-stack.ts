@@ -7,10 +7,12 @@ import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { Construct } from 'constructs';
 import path from 'path';
+import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
 
 export class EventBridgeScanNotifsStack extends cdk.Stack {
   constructor(scope: Construct, id: string, stage: string, props?: cdk.StackProps) {
     super(scope, id, props);
+    applyTerminationProtectionOnStacks([this]);
 
     const topic = new sns.Topic(this, 'ECR Image Inspector Findings');
 

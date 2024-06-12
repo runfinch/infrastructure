@@ -45,5 +45,7 @@ describe('EventBridgeScanNotifsStack', () => {
             ],
         }
     });
+
+    expect(eventBridgeStack.terminationProtection).toBeTruthy();
   });
 })
