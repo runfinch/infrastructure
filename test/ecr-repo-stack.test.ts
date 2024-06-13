@@ -21,5 +21,7 @@ describe('ECRRepositoryStack', () => {
         },
       },
     });
+
+    expect(ecrRepo.terminationProtection).toBeTruthy();
   });
 })

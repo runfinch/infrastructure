@@ -28,5 +28,7 @@ describe('ArtifactBucketCloudfrontStack', () => {
 
     // assert it creates the cloudfront distribution
     template.resourceCountIs('AWS::CloudFront::Distribution', 1);
+
+    expect(cloudfront.terminationProtection).toBeTruthy();
   });
 });

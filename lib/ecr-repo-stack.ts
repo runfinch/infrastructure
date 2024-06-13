@@ -2,12 +2,15 @@ import * as cdk from 'aws-cdk-lib';
 import { CfnOutput } from 'aws-cdk-lib';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import { Construct } from 'constructs';
+import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
 
 export class ECRRepositoryStack extends cdk.Stack {
   public readonly repositoryOutput: CfnOutput;
   public readonly repository: ecr.Repository;
   constructor(scope: Construct, id: string, stage: string, props?: cdk.StackProps) {
     super(scope, id, props);
+    applyTerminationProtectionOnStacks([this]);
+
     const repoName = `finch-rootfs-image-${stage.toLowerCase()}`;
     const ecrRepository = new ecr.Repository(this, 'finch-rootfs', {
         repositoryName:repoName,
