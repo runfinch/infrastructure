@@ -5,7 +5,7 @@
     "runnerTypes": [
       {
         "platform": "mac",
-        "version": "13.2",
+        "version": "13.6",
         "arch": "arm",
         "repo": "finch",
         "desiredInstances": 1,
@@ -13,7 +13,7 @@
       },
       {
         "platform": "mac",
-        "version": "13.2",
+        "version": "13.6",
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
@@ -43,7 +43,7 @@
     "runnerTypes": [
       {
         "platform": "mac",
-        "version": "13.2",
+        "version": "13.6",
         "arch": "arm",
         "repo": "finch",
         "desiredInstances": 2,
@@ -51,7 +51,7 @@
       },
       {
         "platform": "mac",
-        "version": "13.2",
+        "version": "13.6",
         "arch": "x86",
         "repo": "finch",
         "desiredInstances": 2,
@@ -59,7 +59,7 @@
       },
       {
         "platform": "mac",
-        "version": "14.1",
+        "version": "14.5",
         "arch": "arm",
         "repo": "finch",
         "desiredInstances": 2,
@@ -67,7 +67,7 @@
       },
       {
         "platform": "mac",
-        "version": "14.1",
+        "version": "14.5",
         "arch": "x86",
         "repo": "finch",
         "desiredInstances": 2,
@@ -75,7 +75,7 @@
       },
       {
         "platform": "mac",
-        "version": "13.2",
+        "version": "13.6",
         "arch": "arm",
         "repo": "finch-core",
         "desiredInstances": 1,
@@ -83,7 +83,7 @@
       },
       {
         "platform": "mac",
-        "version": "13.2",
+        "version": "13.6",
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
@@ -91,7 +91,7 @@
       },
       {
         "platform": "mac",
-        "version": "14.1",
+        "version": "14.5",
         "arch": "arm",
         "repo": "finch-core",
         "desiredInstances": 1,
@@ -99,7 +99,7 @@
       },
       {
         "platform": "mac",
-        "version": "14.1",
+        "version": "14.5",
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
@@ -129,38 +129,6 @@
     "runnerTypes": [
       {
         "platform": "mac",
-        "version": "13.2",
-        "arch": "arm",
-        "repo": "finch",
-        "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
-      },
-      {
-        "platform": "mac",
-        "version": "13.2",
-        "arch": "x86",
-        "repo": "finch",
-        "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
-      },
-      {
-        "platform": "mac",
-        "version": "14.1",
-        "arch": "arm",
-        "repo": "finch",
-        "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
-      },
-      {
-        "platform": "mac",
-        "version": "14.1",
-        "arch": "x86",
-        "repo": "finch",
-        "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
-      },
-      {
-        "platform": "mac",
         "version": "11.7",
         "arch": "arm",
         "repo": "finch",
@@ -177,17 +145,33 @@
       },
       {
         "platform": "mac",
-        "version": "13.2",
+        "version": "13.6",
         "arch": "arm",
-        "repo": "finch-core",
+        "repo": "finch",
         "desiredInstances": 1,
         "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
       },
       {
         "platform": "mac",
-        "version": "13.2",
+        "version": "13.6",
         "arch": "x86",
-        "repo": "finch-core",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "14.5",
+        "arch": "arm",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "14.5",
+        "arch": "x86",
+        "repo": "finch",
         "desiredInstances": 1,
         "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
       },
@@ -202,6 +186,22 @@
       {
         "platform": "mac",
         "version": "11.7",
+        "arch": "x86",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "13.6",
+        "arch": "arm",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+      },
+      {
+        "platform": "mac",
+        "version": "13.6",
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
