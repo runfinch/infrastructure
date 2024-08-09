@@ -1,5 +1,5 @@
-import config from './env-config.json';
 import * as cdk from 'aws-cdk-lib';
+import config from './env-config.json';
 
 /**
  * Class for environment configurations. Outlines the account and region.

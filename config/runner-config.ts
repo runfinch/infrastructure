@@ -3,12 +3,18 @@ import config from './runner-config.json';
 export interface RunnerProps {
   macLicenseArn: string;
   windowsLicenseArn: string;
+  linuxLicenseArn: string;
   runnerTypes: Array<RunnerType>;
 }
 
 export interface RunnerType {
   platform: PlatformType;
-  version: string; // e.g. 13.2 if platform == macOS, 2022 if platform == windows
+  /** Different values for different platforms.
+   * For mac, a version like 13.2
+   * For windows, a server version like 2022
+   * For amazonlinux, either 2, 2023, etc.
+   * For fedora, a version like 40, 41, etc. */
+  version: string;
   arch: string;
   repo: string;
   desiredInstances: number;
@@ -17,7 +23,8 @@ export interface RunnerType {
 
 export enum PlatformType {
   WINDOWS = 'windows',
-  MAC = 'mac'
+  MAC = 'mac',
+  AMAZONLINUX = 'amazonlinux',
 }
 
 /**
