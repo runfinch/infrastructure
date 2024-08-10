@@ -153,7 +153,7 @@ export class ASGRunnerStack extends cdk.Stack {
     const lt = new ec2.LaunchTemplate(this, ltName, {
       requireImdsv2: true,
       instanceType: new ec2.InstanceType(instanceType),
-      keyName: 'runner-key',
+      keyPair: ec2.KeyPair.fromKeyPairName(this, 'KeyPair', 'runner-key'),
       machineImage: machineImage,
       role: role,
       securityGroup: securityGroup,
