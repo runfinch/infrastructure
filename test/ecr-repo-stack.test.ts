@@ -15,13 +15,13 @@ describe('ECRRepositoryStack', () => {
     template.hasResource('AWS::ECR::Repository', {
       Properties: {
         RepositoryName: Match.anyValue(),
-        ImageTagMutability: "IMMUTABLE",
+        ImageTagMutability: 'IMMUTABLE',
         ImageScanningConfiguration: {
-          ScanOnPush: true,
-        },
-      },
+          ScanOnPush: true
+        }
+      }
     });
 
     expect(ecrRepo.terminationProtection).toBeTruthy();
   });
-})
+});

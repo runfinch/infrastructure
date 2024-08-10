@@ -145,11 +145,11 @@ export class ASGRunnerStack extends cdk.Stack {
     // Create a 100GiB volume to be used as instance root volume
     const rootVolume: ec2.BlockDevice = {
       deviceName: '/dev/sda1',
-      volume: ec2.BlockDeviceVolume.ebs(100),
+      volume: ec2.BlockDeviceVolume.ebs(100)
     };
 
     const asgName = platform === PlatformType.WINDOWS ? 'WindowsASG' : 'MacASG';
-    const ltName = `${asgName}LaunchTemplate`
+    const ltName = `${asgName}LaunchTemplate`;
     const lt = new ec2.LaunchTemplate(this, ltName, {
       requireImdsv2: true,
       instanceType: new ec2.InstanceType(instanceType),
@@ -207,9 +207,9 @@ export class ASGRunnerStack extends cdk.Stack {
           autoscaling.ScalingProcess.REPLACE_UNHEALTHY,
           autoscaling.ScalingProcess.AZ_REBALANCE,
           autoscaling.ScalingProcess.ALARM_NOTIFICATION,
-          autoscaling.ScalingProcess.SCHEDULED_ACTIONS,
+          autoscaling.ScalingProcess.SCHEDULED_ACTIONS
         ],
-        waitOnResourceSignals: false,
+        waitOnResourceSignals: false
       })
     });
 

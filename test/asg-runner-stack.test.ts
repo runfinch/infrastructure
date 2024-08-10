@@ -58,6 +58,6 @@ describe('ASGRunnerStack test', () => {
   it('must have termination protection enabled', () => {
     stacks.forEach((stack) => {
       expect(stack.terminationProtection).toBeTruthy();
-    })
+    });
   });
 });

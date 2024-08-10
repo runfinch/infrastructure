@@ -19,36 +19,36 @@ export class EventBridgeScanNotifsStack extends cdk.Stack {
     // Let's not expose this on GitHub, will only be visible in AWS logs Finch team owns, which is low risk.
     // Secret has to be created only in Prod account.
     // unsafeUnwrap is used because SNS does not have any construct that accepts a SecretValue property.
-    const securityEmail = cdk.SecretValue.secretsManager('security-notifications-email').unsafeUnwrap()
+    const securityEmail = cdk.SecretValue.secretsManager('security-notifications-email').unsafeUnwrap();
     topic.addSubscription(new subscriptions.EmailSubscription(securityEmail.toString()));
 
     const notificationFn = new lambda.Function(this, 'SendECRImageInspectorFindings', {
       runtime: lambda.Runtime.PYTHON_3_11,
       handler: 'main.lambda_handler',
       code: lambda.Code.fromAsset(path.join(__dirname, 'image-scanning-notifications-lambda-handler')),
-      environment: {'SNS_ARN': topic.topicArn,},
+      environment: { SNS_ARN: topic.topicArn }
     });
 
     const snsTopicPolicy = new iam.PolicyStatement({
       actions: ['sns:publish'],
-      resources: ['*'],
+      resources: ['*']
     });
 
     notificationFn.addToRolePolicy(snsTopicPolicy);
-    
+
     // Only publish CRITICAL and HIGH findings (more than 7.0 CVE score) that are ACTIVE
     // https://docs.aws.amazon.com/inspector/latest/user/findings-understanding-severity.html
     const rule = new events.Rule(this, 'rule', {
-        eventPattern: {
-          source: ['aws.inspector2'],
-          detail: {
-            severity: ['HIGH', 'CRITICAL'], 
-            status: events.Match.exactString('ACTIVE')
-          },
-          detailType: events.Match.exactString('Inspector2 Finding'),
+      eventPattern: {
+        source: ['aws.inspector2'],
+        detail: {
+          severity: ['HIGH', 'CRITICAL'],
+          status: events.Match.exactString('ACTIVE')
         },
-      });
+        detailType: events.Match.exactString('Inspector2 Finding')
+      }
+    });
 
-    rule.addTarget(new targets.LambdaFunction(notificationFn))
+    rule.addTarget(new targets.LambdaFunction(notificationFn));
   }
 }

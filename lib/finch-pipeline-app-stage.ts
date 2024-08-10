@@ -32,8 +32,11 @@ export class FinchPipelineAppStage extends cdk.Stage {
     super(scope, id, props);
     props.runnerConfig.runnerTypes.forEach((runnerType) => {
       const ASGStackName = `ASG-${runnerType.platform}-${runnerType.repo}-${runnerType.version.split('.')[0]}-${runnerType.arch}Stack`;
-      const licenseArn = runnerType.platform === PlatformType.WINDOWS ? props.runnerConfig.windowsLicenseArn : props.runnerConfig.macLicenseArn;
-      new ASGRunnerStack(this, ASGStackName , {
+      const licenseArn =
+        runnerType.platform === PlatformType.WINDOWS
+          ? props.runnerConfig.windowsLicenseArn
+          : props.runnerConfig.macLicenseArn;
+      new ASGRunnerStack(this, ASGStackName, {
         env: props.env,
         stage: props.environmentStage,
         licenseArn: licenseArn,
@@ -50,28 +53,21 @@ export class FinchPipelineAppStage extends cdk.Stage {
       this.artifactBucketCloudfrontUrlOutput = artifactBucketCloudfrontStack.urlOutput;
       this.cloudfrontBucket = artifactBucketCloudfrontStack.bucket;
 
-      const ecrRepositoryStack = new ECRRepositoryStack(
-        this,
-        'ECRRepositoryStack',
-        this.stageName
-      );
+      const ecrRepositoryStack = new ECRRepositoryStack(this, 'ECRRepositoryStack', this.stageName);
 
       this.ecrRepositoryOutput = ecrRepositoryStack.repositoryOutput;
       this.ecrRepository = ecrRepositoryStack.repository;
 
       // Only report rootfs image scans in prod to avoid duplicate notifications.
       if (props.environmentStage == ENVIRONMENT_STAGE.Prod) {
-        new EventBridgeScanNotifsStack(this, 'EventBridgeScanNotifsStack', this.stageName)
+        new EventBridgeScanNotifsStack(this, 'EventBridgeScanNotifsStack', this.stageName);
       }
 
-      new ContinuousIntegrationStack(
-        this, 
-        'FinchContinuousIntegrationStack', 
-        this.stageName, 
-        { rootfsEcrRepository: this.ecrRepository }
-      );
+      new ContinuousIntegrationStack(this, 'FinchContinuousIntegrationStack', this.stageName, {
+        rootfsEcrRepository: this.ecrRepository
+      });
     }
 
-    new PVREReportingStack(this, 'PVREReportingStack', { terminationProtection:true });
+    new PVREReportingStack(this, 'PVREReportingStack', { terminationProtection: true });
   }
 }
