@@ -52,7 +52,7 @@ export class ContinuousIntegrationStack extends cdk.Stack {
 
     const repo = props.rootfsEcrRepository;
     repo.grantPullPush(githubActionsRole);
-    ecr.AuthorizationToken.grantRead(githubActionsRole)
+    ecr.AuthorizationToken.grantRead(githubActionsRole);
 
     new CloudfrontCdn(this, 'DependenciesCloudfrontCdn', {
       bucket
