@@ -36,9 +36,11 @@ export class FinchPipelineAppStage extends cdk.Stage {
       switch (runnerType.platform) {
         case PlatformType.MAC: {
           licenseArn = props.runnerConfig.macLicenseArn;
+          break;
         }
         case PlatformType.WINDOWS: {
           licenseArn = props.runnerConfig.windowsLicenseArn;
+          break;
         }
       }
       new ASGRunnerStack(this, ASGStackName, {
