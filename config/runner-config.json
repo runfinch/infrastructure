@@ -9,7 +9,12 @@
         "arch": "arm",
         "repo": "finch",
         "desiredInstances": 1,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "mac",
@@ -17,7 +22,12 @@
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "windows",
@@ -25,7 +35,12 @@
         "arch": "x86",
         "repo": "finch",
         "desiredInstances": 1,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "windows",
@@ -33,7 +48,64 @@
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
+      },
+      {
+        "platform": "amazonlinux",
+        "version": "2023",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
+      },
+      {
+        "platform": "amazonlinux",
+        "version": "2",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
+      },
+      {
+        "platform": "amazonlinux",
+        "version": "2023",
+        "arch": "arm",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
+      },
+      {
+        "platform": "amazonlinux",
+        "version": "2",
+        "arch": "arm",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       }
     ]
   },
@@ -47,7 +119,12 @@
         "arch": "arm",
         "repo": "finch",
         "desiredInstances": 2,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "mac",
@@ -55,7 +132,12 @@
         "arch": "x86",
         "repo": "finch",
         "desiredInstances": 2,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "mac",
@@ -63,7 +145,12 @@
         "arch": "arm",
         "repo": "finch",
         "desiredInstances": 2,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "mac",
@@ -71,7 +158,12 @@
         "arch": "x86",
         "repo": "finch",
         "desiredInstances": 2,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "mac",
@@ -79,7 +171,12 @@
         "arch": "arm",
         "repo": "finch-core",
         "desiredInstances": 1,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "mac",
@@ -87,7 +184,12 @@
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "mac",
@@ -95,7 +197,12 @@
         "arch": "arm",
         "repo": "finch-core",
         "desiredInstances": 1,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "mac",
@@ -103,7 +210,12 @@
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "windows",
@@ -111,7 +223,12 @@
         "arch": "x86",
         "repo": "finch",
         "desiredInstances": 2,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       },
       {
         "platform": "windows",
@@ -119,7 +236,64 @@
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
-        "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
+      },
+      {
+        "platform": "amazonlinux",
+        "version": "2023",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
+      },
+      {
+        "platform": "amazonlinux",
+        "version": "2",
+        "arch": "x86",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
+      },
+      {
+        "platform": "amazonlinux",
+        "version": "2023",
+        "arch": "arm",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
+      },
+      {
+        "platform": "amazonlinux",
+        "version": "2",
+        "arch": "arm",
+        "repo": "finch",
+        "desiredInstances": 1,
+        "availabilityZones": [
+          "us-west-2a",
+          "us-west-2b",
+          "us-west-2c",
+          "us-west-2d"
+        ]
       }
     ]
   },
@@ -133,7 +307,11 @@
         "arch": "arm",
         "repo": "finch",
         "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+        "availabilityZones": [
+          "us-east-2a",
+          "us-east-2b",
+          "us-east-2c"
+        ]
       },
       {
         "platform": "mac",
@@ -141,7 +319,11 @@
         "arch": "x86",
         "repo": "finch",
         "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+        "availabilityZones": [
+          "us-east-2a",
+          "us-east-2b",
+          "us-east-2c"
+        ]
       },
       {
         "platform": "mac",
@@ -149,7 +331,11 @@
         "arch": "arm",
         "repo": "finch",
         "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+        "availabilityZones": [
+          "us-east-2a",
+          "us-east-2b",
+          "us-east-2c"
+        ]
       },
       {
         "platform": "mac",
@@ -157,7 +343,11 @@
         "arch": "x86",
         "repo": "finch",
         "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+        "availabilityZones": [
+          "us-east-2a",
+          "us-east-2b",
+          "us-east-2c"
+        ]
       },
       {
         "platform": "mac",
@@ -165,7 +355,11 @@
         "arch": "arm",
         "repo": "finch-core",
         "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+        "availabilityZones": [
+          "us-east-2a",
+          "us-east-2b",
+          "us-east-2c"
+        ]
       },
       {
         "platform": "mac",
@@ -173,7 +367,11 @@
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+        "availabilityZones": [
+          "us-east-2a",
+          "us-east-2b",
+          "us-east-2c"
+        ]
       },
       {
         "platform": "windows",
@@ -181,7 +379,11 @@
         "arch": "x86",
         "repo": "finch",
         "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+        "availabilityZones": [
+          "us-east-2a",
+          "us-east-2b",
+          "us-east-2c"
+        ]
       },
       {
         "platform": "windows",
@@ -189,7 +391,11 @@
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
-        "availabilityZones": ["us-east-2a", "us-east-2b", "us-east-2c"]
+        "availabilityZones": [
+          "us-east-2a",
+          "us-east-2b",
+          "us-east-2c"
+        ]
       }
     ]
   }

@@ -1,8 +1,8 @@
 import * as cdk from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
+import { PlatformType, RunnerConfig, RunnerType } from '../config/runner-config';
 import { ASGRunnerStack } from '../lib/asg-runner-stack';
 import { ENVIRONMENT_STAGE } from '../lib/finch-pipeline-app-stage';
-import { PlatformType, RunnerConfig, RunnerType } from '../config/runner-config';
 
 const generateASGStackName = (runnerType: RunnerType) =>
   `ASG-${runnerType.platform}-${runnerType.repo}-${runnerType.version.split('.')[0]}-${runnerType.arch}Stack`;
@@ -46,10 +46,29 @@ describe('ASGRunnerStack test', () => {
       const stack = stacks.find((stack) => stack.stackName === generateASGStackName(type));
       expect(stack).toBeDefined();
       const template = Template.fromStack(stack!);
+      let instanceType = '';
+      switch (type.platform) {
+        case PlatformType.WINDOWS: {
+          instanceType = 'm5zn.metal';
+        }
+        case PlatformType.MAC: {
+          if (type.arch === 'arm') {
+            instanceType = 'mac2.metal';
+          } else {
+            instanceType = 'mac1.metal';
+          }
+        }
+        case PlatformType.AMAZONLINUX: {
+          if (type.arch === 'arm') {
+            instanceType = 'c7g.large';
+          } else {
+            instanceType = 'c7a.large';
+          }
+        }
+      }
       template.hasResourceProperties('AWS::EC2::LaunchTemplate', {
         LaunchTemplateData: {
-          InstanceType:
-            type.platform === PlatformType.WINDOWS ? 'm5zn.metal' : type.arch === 'arm' ? 'mac2.metal' : 'mac1.metal'
+          InstanceType: instanceType
         }
       });
     });
@@ -58,6 +77,6 @@ describe('ASGRunnerStack test', () => {
   it('must have termination protection enabled', () => {
     stacks.forEach((stack) => {
       expect(stack.terminationProtection).toBeTruthy();
-    })
+    });
   });
 });
