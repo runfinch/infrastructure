@@ -85,6 +85,7 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
         });
         asgName = 'MacASG';
         userDataString = this.userData(props, 'setup-runner.sh');
+        break;
       }
       case PlatformType.WINDOWS: {
         instanceType = ec2.InstanceType.of(ec2.InstanceClass.M5ZN, ec2.InstanceSize.METAL);
@@ -96,6 +97,7 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
           .replace('<STAGE>', props.stage === ENVIRONMENT_STAGE.Release ? 'release' : 'test')
           .replace('<REPO>', props.type.repo)
           .replace('<REGION>', props.env?.region || '');
+          break;
       }
       case PlatformType.AMAZONLINUX: {
         // Linux instances do not have to be metal, since the only mode of operation
@@ -120,6 +122,7 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
             cpuType
           });
         }
+        break;
       }
     }
 

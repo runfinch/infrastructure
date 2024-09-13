@@ -50,6 +50,7 @@ describe('ASGRunnerStack test', () => {
       switch (type.platform) {
         case PlatformType.WINDOWS: {
           instanceType = 'm5zn.metal';
+          break;
         }
         case PlatformType.MAC: {
           if (type.arch === 'arm') {
@@ -57,6 +58,7 @@ describe('ASGRunnerStack test', () => {
           } else {
             instanceType = 'mac1.metal';
           }
+          break;
         }
         case PlatformType.AMAZONLINUX: {
           if (type.arch === 'arm') {
@@ -64,6 +66,7 @@ describe('ASGRunnerStack test', () => {
           } else {
             instanceType = 'c7a.large';
           }
+          break;
         }
       }
       template.hasResourceProperties('AWS::EC2::LaunchTemplate', {
