@@ -101,17 +101,24 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
         // Linux instances do not have to be metal, since the only mode of operation
         // for Finch on linux currently is "native" mode, e.g. no virutal machine on host
 
+        let cpuType: ec2.AmazonLinuxCpuType;
         if (this.arch === 'arm') {
           instanceType = ec2.InstanceType.of(ec2.InstanceClass.C7G, ec2.InstanceSize.LARGE);
+          cpuType = ec2.AmazonLinuxCpuType.ARM_64;
         } else {
           instanceType = ec2.InstanceType.of(ec2.InstanceClass.C7A, ec2.InstanceSize.LARGE);
+          cpuType = ec2.AmazonLinuxCpuType.X86_64;
         }
         asgName = 'LinuxASG';
         userDataString = this.userData(props, 'setup-linux-runner.sh');
         if (this.version === '2') {
-          machineImage = ec2.MachineImage.latestAmazonLinux2();
+          machineImage = ec2.MachineImage.latestAmazonLinux2({
+            cpuType
+          });
         } else {
-          machineImage = ec2.MachineImage.latestAmazonLinux2023();
+          machineImage = ec2.MachineImage.latestAmazonLinux2023({
+            cpuType
+          });
         }
       }
     }
