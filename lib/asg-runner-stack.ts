@@ -107,7 +107,7 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
         // Linux instances do not have to be metal, since the only mode of operation
         // for Finch on linux currently is "native" mode, e.g. no virutal machine on host
 
-        rootDeviceName = '/dev/sda1';
+        rootDeviceName = '/dev/xvda';
         let cpuType: ec2.AmazonLinuxCpuType;
         if (this.arch === 'arm') {
           instanceType = ec2.InstanceType.of(ec2.InstanceClass.C7G, ec2.InstanceSize.LARGE);
