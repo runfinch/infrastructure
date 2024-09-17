@@ -97,7 +97,7 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
           .replace('<STAGE>', props.stage === ENVIRONMENT_STAGE.Release ? 'release' : 'test')
           .replace('<REPO>', props.type.repo)
           .replace('<REGION>', props.env?.region || '');
-          break;
+        break;
       }
       case PlatformType.AMAZONLINUX: {
         // Linux instances do not have to be metal, since the only mode of operation
@@ -165,7 +165,13 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
     // Create a 100GiB volume to be used as instance root volume
     const rootVolume: ec2.BlockDevice = {
       deviceName: '/dev/sda1',
-      volume: ec2.BlockDeviceVolume.ebs(100)
+      volume: ec2.BlockDeviceVolume.ebs(100, {
+        volumeType: ec2.EbsDeviceVolumeType.GP3,
+        // throughput / 256 KiB per operation
+        // default is size * 3
+        iops: 1200,
+        throughput: 300
+      })
     };
 
     const ltName = `${asgName}LaunchTemplate`;
