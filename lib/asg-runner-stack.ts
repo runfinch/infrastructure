@@ -66,8 +66,10 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
     let machineImage: ec2.IMachineImage;
     let userDataString = '';
     let asgName = '';
+    let rootDeviceName = '';
     switch (this.platform) {
       case PlatformType.MAC: {
+        rootDeviceName = '/dev/sda1';
         if (this.arch === 'arm') {
           instanceType = ec2.InstanceType.of(ec2.InstanceClass.MAC2, ec2.InstanceSize.METAL);
         } else {
@@ -90,6 +92,7 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
       case PlatformType.WINDOWS: {
         instanceType = ec2.InstanceType.of(ec2.InstanceClass.M5ZN, ec2.InstanceSize.METAL);
         asgName = 'WindowsASG';
+        rootDeviceName = '/dev/sda1';
         machineImage = ec2.MachineImage.latestWindows(ec2.WindowsVersion.WINDOWS_SERVER_2022_ENGLISH_FULL_BASE);
         // We need to provide user data as a yaml file to specify runAs: admin
         // Maintain that file as yaml and source here to ensure formatting.
@@ -97,12 +100,14 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
           .replace('<STAGE>', props.stage === ENVIRONMENT_STAGE.Release ? 'release' : 'test')
           .replace('<REPO>', props.type.repo)
           .replace('<REGION>', props.env?.region || '');
+
         break;
       }
       case PlatformType.AMAZONLINUX: {
         // Linux instances do not have to be metal, since the only mode of operation
         // for Finch on linux currently is "native" mode, e.g. no virutal machine on host
 
+        rootDeviceName = '/dev/sda1';
         let cpuType: ec2.AmazonLinuxCpuType;
         if (this.arch === 'arm') {
           instanceType = ec2.InstanceType.of(ec2.InstanceClass.C7G, ec2.InstanceSize.LARGE);
@@ -164,7 +169,7 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
 
     // Create a 100GiB volume to be used as instance root volume
     const rootVolume: ec2.BlockDevice = {
-      deviceName: '/dev/sda1',
+      deviceName: rootDeviceName,
       volume: ec2.BlockDeviceVolume.ebs(100, {
         volumeType: ec2.EbsDeviceVolumeType.GP3,
         // throughput / 256 KiB per operation
