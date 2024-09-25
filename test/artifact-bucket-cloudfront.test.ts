@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
-import { Template, Match } from 'aws-cdk-lib/assertions';
+import { Match, Template } from 'aws-cdk-lib/assertions';
 import { ArtifactBucketCloudfrontStack } from '../lib/artifact-bucket-cloudfront';
 
 describe('ArtifactBucketCloudfrontStack', () => {

@@ -10,6 +10,7 @@ import { ContinuousIntegrationStack } from './continuous-integration-stack';
 import { ECRRepositoryStack } from './ecr-repo-stack';
 import { EventBridgeScanNotifsStack } from './event-bridge-scan-notifs-stack';
 import { PVREReportingStack } from './pvre-reporting-stack';
+import { SSMPatchingStack } from './ssm-patching-stack';
 
 export enum ENVIRONMENT_STAGE {
   Beta,
@@ -76,5 +77,7 @@ export class FinchPipelineAppStage extends cdk.Stage {
     }
 
     new PVREReportingStack(this, 'PVREReportingStack', { terminationProtection: true });
+    
+    new SSMPatchingStack(this, 'SSMPatchingStack', { terminationProtection: true });
   }
 }

@@ -21,7 +21,7 @@ export interface RunnerType {
   availabilityZones: Array<string>;
 }
 
-export enum PlatformType {
+export const enum PlatformType {
   WINDOWS = 'windows',
   MAC = 'mac',
   AMAZONLINUX = 'amazonlinux',

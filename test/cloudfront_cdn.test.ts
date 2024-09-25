@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
-import { Template, Match } from 'aws-cdk-lib/assertions';
+import { Match, Template } from 'aws-cdk-lib/assertions';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { CfnBucket } from 'aws-cdk-lib/aws-s3';
 import { CloudfrontCdn } from '../lib/cloudfront_cdn';

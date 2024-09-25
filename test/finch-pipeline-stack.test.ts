@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { FinchPipelineStack } from '../lib/finch-pipeline-stack';
 import { EnvConfig } from '../config/env-config';
+import { FinchPipelineStack } from '../lib/finch-pipeline-stack';
 
 describe('FinchPipelineStack', () => {
   test('synthesizes the way we expect', () => {
