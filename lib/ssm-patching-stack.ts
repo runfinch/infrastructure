@@ -13,8 +13,8 @@ export class SSMPatchingStack extends cdk.Stack {
       allowUnassociatedTargets: false,
       cutoff: 0,
       duration: 2,
-      // Every Sunday at 3 AM
-      schedule: 'cron(0 3 ? * SUN *)'
+      // Every day at 8 AM UTC
+      schedule: 'cron(0 8 ? * * *)'
     });
 
     const maintenanceTarget = new CfnMaintenanceWindowTarget(this, 'MaintenanceWindowTarget', {
@@ -49,7 +49,7 @@ export class SSMPatchingStack extends cdk.Stack {
           documentVersion: '$LATEST'
         }
       },
-      maxErrors: '0',
+      maxErrors: '100%',
       maxConcurrency: '1'
     });
   }
