@@ -15,7 +15,7 @@ describe('SSMPatchingStack', () => {
         Cutoff: 0,
         Duration: 2,
         Name: 'Patching-Window',
-        Schedule: 'cron(0 3 ? * SUN *)'
+        Schedule: 'cron(0 8 ? * * *)'
       }
     });
 
@@ -38,7 +38,7 @@ describe('SSMPatchingStack', () => {
     template.hasResource('AWS::SSM::MaintenanceWindowTask', {
       Properties: {
         MaxConcurrency: '1',
-        MaxErrors: '0',
+        MaxErrors: '100%',
         Name: 'Patch-Task',
         Priority: 1,
         Targets: [
