@@ -11,6 +11,7 @@ import { ECRRepositoryStack } from './ecr-repo-stack';
 import { EventBridgeScanNotifsStack } from './event-bridge-scan-notifs-stack';
 import { PVREReportingStack } from './pvre-reporting-stack';
 import { SSMPatchingStack } from './ssm-patching-stack';
+import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
 
 export enum ENVIRONMENT_STAGE {
   Beta,
@@ -31,6 +32,7 @@ export class FinchPipelineAppStage extends cdk.Stage {
 
   constructor(scope: Construct, id: string, props: FinchPipelineAppStageProps) {
     super(scope, id, props);
+    applyTerminationProtectionOnStacks([this]);
     props.runnerConfig.runnerTypes.forEach((runnerType) => {
       const ASGStackName = `ASG-${runnerType.platform}-${runnerType.repo}-${runnerType.version.split('.')[0]}-${runnerType.arch}Stack`;
       let licenseArn: string | undefined;
