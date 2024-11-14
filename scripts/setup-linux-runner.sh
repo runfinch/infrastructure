@@ -21,6 +21,10 @@ if [ "${OS_NAME}" = "Amazon Linux" ]; then
     if [ "${OS_VERSION}" = "2" ]; then
         GH_RUNNER_DEPENDENCIES="openssl krb5-libs zlib jq"
         ADDITIONAL_PACKAGES="policycoreutils-python systemd-rpm-macros ${GH_RUNNER_DEPENDENCIES}"
+        NODE_VERSION="22.9.0"
+        curl -OL https://d3rnber7ry90et.cloudfront.net/linux-$(uname -m)/node-v${NODE_VERSION}.tar.gz
+        tar -xf node-v${NODE_VERSION}.tar.gz
+        mv node-v${NODE_VERSION}/bin/* /usr/bin
     elif [ "${OS_VERSION}" = "2023" ]; then
         GH_RUNNER_DEPENDENCIES="lttng-ust openssl-libs krb5-libs zlib libicu"
         ADDITIONAL_PACKAGES="policycoreutils-python-utils ${GH_RUNNER_DEPENDENCIES}"
