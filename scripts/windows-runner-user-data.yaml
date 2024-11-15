@@ -47,8 +47,8 @@ tasks:
           Import-Module -Name Appx -UseWindowsPowerShell
 
           # Install git and Make
-          Invoke-WebRequest -Uri 'https://github.com/git-for-windows/git/releases/download/v2.44.0.windows.1/Git-2.44.0-64-bit.exe' -OutFile 'git-2.44.0.exe'
-          .\git-2.44.0.exe /SILENT
+          Invoke-WebRequest -Uri 'https://github.com/git-for-windows/git/releases/download/v2.47.0.windows.2/Git-2.47.0.2-64-bit.exe' -OutFile 'git-2.47.0.2.exe'
+          .\git-2.47.0.2.exe /SILENT
           # use curl to follow redirects
           & "C:\Windows\System32\curl.exe" -L https://sourceforge.net/projects/gnuwin32/files/make/3.81/make-3.81.exe/download -o make.exe
           .\make.exe /SILENT
@@ -60,14 +60,14 @@ tasks:
           Install-Module -Name AWS.Tools.AutoScaling -Force
 
           # Install Go
-          Invoke-WebRequest -Uri 'https://go.dev/dl/go1.22.2.windows-amd64.msi' -OutFile 'go1.22.2.windows-amd64.msi'
-          Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Users\Administrator\setup\go1.22.2.windows-amd64.msi /quiet'
+          Invoke-WebRequest -Uri 'https://go.dev/dl/go1.23.3.windows-amd64.msi' -OutFile 'go1.23.3.windows-amd64.msi'
+          Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Users\Administrator\setup\go1.23.3.windows-amd64.msi /quiet'
 
           # Install yq
-          Invoke-WebRequest -Uri 'https://github.com/mikefarah/yq/releases/download/v4.43.1/yq_windows_amd64.exe' -OutFile '.\bin\yq.exe'
+          Invoke-WebRequest -Uri 'https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_windows_amd64.exe' -OutFile '.\bin\yq.exe'
 
           # Configure path; include path to pre release WSL
-          $newPath = ("C:\Program Files\Git\usr\bin\;" + "C:\Program Files\WSL\;" + "$env:Path" + ";C:\Program Files\Git\bin\;" + "C:\Program Files (x86)\GnuWin32\bin\;" + "C:\Program Files\Go\bin\;" + "$Home\setup\bin\;")
+          $newPath = ("C:\Program Files\Git\bin\;" + "C:\Program Files\Git\usr\bin\;" + "C:\Program Files\WSL\;" + "$env:Path" + ";C:\Program Files\Git\bin\;" + "C:\Program Files (x86)\GnuWin32\bin\;" + "C:\Program Files\Go\bin\;" + "$Home\setup\bin\;")
           $env:Path = $newPath
           # Persist the path to the registry for new shells
           Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value $newPath
