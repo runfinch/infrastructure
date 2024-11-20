@@ -59,6 +59,12 @@ tasks:
           Install-Module -Name AWS.Tools.EC2 -Force
           Install-Module -Name AWS.Tools.AutoScaling -Force
 
+          # Install AWS CLI
+          Invoke-WebRequest -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile AWSCLIV2.msi
+          Start-Process msiexec.exe -Wait -ArgumentList '/I AWSCLIV2.msi /quiet'
+          aws --version
+          Remove-Item AWSCLIV2.msi
+
           # Install Go
           Invoke-WebRequest -Uri 'https://go.dev/dl/go1.23.3.windows-amd64.msi' -OutFile 'go1.23.3.windows-amd64.msi'
           Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Users\Administrator\setup\go1.23.3.windows-amd64.msi /quiet'
