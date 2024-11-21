@@ -65,6 +65,22 @@ tasks:
           aws --version
           Remove-Item AWSCLIV2.msi
 
+          # Add AWS CLI to PATH
+          $awsPath = Get-Command aws -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
+          if ($awsPath) {
+              $awsDir = Split-Path -Parent $awsPath
+              $currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
+              if ($currentPath -notlike "*$awsDir*") {
+                  $newPath = "$currentPath;$awsDir"
+                  [Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
+                  Write-Output "AWS CLI path added to system PATH: $awsDir"
+              } else {
+                  Write-Output "AWS CLI path already in system PATH"
+              }
+          } else {
+              Write-Output "AWS CLI not found"
+          }
+              
           # Install Go
           Invoke-WebRequest -Uri 'https://go.dev/dl/go1.23.3.windows-amd64.msi' -OutFile 'go1.23.3.windows-amd64.msi'
           Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Users\Administrator\setup\go1.23.3.windows-amd64.msi /quiet'
