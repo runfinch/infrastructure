@@ -65,12 +65,6 @@ tasks:
           aws --version
           Remove-Item AWSCLIV2.msi
 
-          # Add AWS CLI to PATH
-          $awsPath = "C:\Program Files\Amazon\AWSCLIV2"
-          $currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
-          $newPath = "$currentPath;$awsPath"
-          [Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
-              
           # Install Go
           Invoke-WebRequest -Uri 'https://go.dev/dl/go1.23.3.windows-amd64.msi' -OutFile 'go1.23.3.windows-amd64.msi'
           Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Users\Administrator\setup\go1.23.3.windows-amd64.msi /quiet'
