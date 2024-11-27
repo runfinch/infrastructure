@@ -62,14 +62,7 @@ tasks:
           # Install AWS CLI
           Invoke-WebRequest -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile AWSCLIV2.msi
           Start-Process msiexec.exe -Wait -ArgumentList '/I AWSCLIV2.msi /quiet'
-          aws --version
           Remove-Item AWSCLIV2.msi
-
-          # Add AWS CLI to PATH
-          $awsPath = "C:\Program Files\Amazon\AWSCLIV2"
-          $currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
-          $newPath = "$currentPath;$awsPath"
-          [Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
               
           # Install Go
           Invoke-WebRequest -Uri 'https://go.dev/dl/go1.23.3.windows-amd64.msi' -OutFile 'go1.23.3.windows-amd64.msi'
@@ -79,7 +72,7 @@ tasks:
           Invoke-WebRequest -Uri 'https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_windows_amd64.exe' -OutFile '.\bin\yq.exe'
 
           # Configure path; include path to pre release WSL
-          $newPath = ("C:\Program Files\Git\bin\;" + "C:\Program Files\Git\usr\bin\;" + "C:\Program Files\WSL\;" + "$env:Path" + ";C:\Program Files\Git\bin\;" + "C:\Program Files (x86)\GnuWin32\bin\;" + "C:\Program Files\Go\bin\;" + "$Home\setup\bin\;")
+          $newPath = ("C:\Program Files\Git\bin\;" + "C:\Program Files\Git\usr\bin\;" + "C:\Program Files\WSL\;" + "$env:Path" + ";C:\Program Files\Git\bin\;" + "C:\Program Files (x86)\GnuWin32\bin\;" + "C:\Program Files\Go\bin\;" + "$Home\setup\bin\;" + "C:\Program Files\Amazon\AWSCLIV2\;")
           $env:Path = $newPath
           # Persist the path to the registry for new shells
           Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value $newPath
