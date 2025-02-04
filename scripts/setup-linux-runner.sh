@@ -51,10 +51,10 @@ systemctl enable --now containerd
 UNAME_MACHINE="$(/usr/bin/uname -m)"
 if [ "${UNAME_MACHINE}" = "aarch64" ]; then
     GH_RUNNER_ARCH="arm64"
-    GH_RUNNER_DOWNLOAD_HASH="524e75dc384ba8289fcea4914eb210f10c8c4e143213cef7d28f0c84dd2d017c"
+    GH_RUNNER_DOWNLOAD_HASH="bec1832fe6d2ed75acf4b7d8f2ce1169239a913b84ab1ded028076c9fa5091b8"
 else
     GH_RUNNER_ARCH="x64"
-    GH_RUNNER_DOWNLOAD_HASH="52b8f9c5abb1a47cc506185a1a20ecea19daf0d94bbf4ddde7e617e7be109b14"
+    GH_RUNNER_DOWNLOAD_HASH="93ac1b7ce743ee85b5d386f5c1787385ef07b3d7c728ff66ce0d3813d5f46900"
 fi
 
 GH_RUNNER_FILENAME="actions-runner-linux-${GH_RUNNER_ARCH}-2.320.0.tar.gz"
