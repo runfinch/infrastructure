@@ -57,8 +57,8 @@ else
     GH_RUNNER_DOWNLOAD_HASH="52b8f9c5abb1a47cc506185a1a20ecea19daf0d94bbf4ddde7e617e7be109b14"
 fi
 
-GH_RUNNER_FILENAME="actions-runner-linux-${GH_RUNNER_ARCH}-2.319.0.tar.gz"
-GH_RUNNER_DOWNLOAD_URL="https://github.com/actions/runner/releases/download/v2.319.0/${GH_RUNNER_FILENAME}"
+GH_RUNNER_FILENAME="actions-runner-linux-${GH_RUNNER_ARCH}-2.320.0.tar.gz"
+GH_RUNNER_DOWNLOAD_URL="https://github.com/actions/runner/releases/download/v2.320.0/${GH_RUNNER_FILENAME}"
 
 curl -OL "${GH_RUNNER_DOWNLOAD_URL}"
 echo "${GH_RUNNER_DOWNLOAD_HASH}  ${GH_RUNNER_FILENAME}" | sha256sum -c
@@ -85,7 +85,7 @@ fi
 # Configure the runner with the registration token, launch the service
 # these commands must NOT be run as root
 sudo -i -u "${USERNAME}" bash <<EOF
-"${RUNNER_DIR}/config.sh" --url "https://github.com/runfinch/${REPO}" --unattended --token "${RUNNER_REG_TOKEN}" --work _work --labels "${LABEL_ARCH},${DISTRO},${OS_VERSION},${LABEL_STAGE}"
+"${RUNNER_DIR}/config.sh" --url "https://github.com/runfinch/${REPO}" --unattended --token "${RUNNER_REG_TOKEN}" --work _work --disableupdate --labels "${LABEL_ARCH},${DISTRO},${OS_VERSION},${LABEL_STAGE}"
 EOF
 
 # these commands need to be run from "runner root" as the root user
