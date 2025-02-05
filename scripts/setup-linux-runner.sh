@@ -126,8 +126,6 @@ EOF
 # these commands need to be run from "runner root" as the root user
 cd "${RUNNER_DIR}"
 # fix SELinux perms so systemctl can execute
-semanage fcontext -d "${RUNNER_DIR}/runsvc.sh"
 semanage fcontext -a -t "bin_t" "${RUNNER_DIR}/runsvc.sh"
 ./svc.sh install "${USERNAME}"
-restorecon -Fv "${RUNNER_DIR}/runsvc.sh"
 ./svc.sh start
