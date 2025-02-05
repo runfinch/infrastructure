@@ -1,9 +1,10 @@
 #!/usr/bin/bash
+set -ex
 
 # The user data script is run as root so do not use sudo command
 
 # Log output
-exec &>/var/log/setup-runner.log
+exec &> >(tee /var/log/setup-runner.log)
 echo $0
 
 # load all variables from /etc/os-release prefixed with OS_RELEASE as to not clobber
@@ -14,6 +15,18 @@ source <(sed -Ee "s/^([^#])/${OS_RELEASE_PREFIX}_\1/" "/etc/os-release")
 eval "OS_NAME=\"\${${OS_RELEASE_PREFIX}_NAME}\""
 eval "OS_VERSION=\"\${${OS_RELEASE_PREFIX}_VERSION_ID}\""
 
+# configure download parameters based on architecture
+UNAME_MACHINE="$(/usr/bin/uname -m)"
+if [ "${UNAME_MACHINE}" = "aarch64" ]; then
+    GH_RUNNER_ARCH="arm64"
+    NODE_DOWNLOAD_ARCH="arm64"
+    GH_RUNNER_DOWNLOAD_HASH="a96b0cec7b0237ca5e4210982368c6f7d8c2ab1e5f6b2604c1ccede9cedcb143"
+else
+    GH_RUNNER_ARCH="x64"
+    NODE_DOWNLOAD_ARCH="x86_64"
+    GH_RUNNER_DOWNLOAD_HASH="b13b784808359f31bc79b08a191f5f83757852957dd8fe3dbfcc38202ccf5768"
+fi
+
 if [ "${OS_NAME}" = "Amazon Linux" ]; then
     USERNAME="ec2-user"
     DISTRO="amazonlinux"
@@ -21,8 +34,8 @@ if [ "${OS_NAME}" = "Amazon Linux" ]; then
     if [ "${OS_VERSION}" = "2" ]; then
         GH_RUNNER_DEPENDENCIES="openssl krb5-libs zlib jq"
         ADDITIONAL_PACKAGES="policycoreutils-python systemd-rpm-macros ${GH_RUNNER_DEPENDENCIES}"
-        NODE_VERSION="22.9.0"
-        curl -OL https://d3rnber7ry90et.cloudfront.net/linux-$(uname -m)/node-v${NODE_VERSION}.tar.gz
+        NODE_VERSION="21.2.0"
+        curl -OL "https://d3rnber7ry90et.cloudfront.net/linux-${NODE_DOWNLOAD_ARCH}/node-v${NODE_VERSION}.tar.gz"
         tar -xf node-v${NODE_VERSION}.tar.gz
         mv node-v${NODE_VERSION}/bin/* /usr/bin
     elif [ "${OS_VERSION}" = "2023" ]; then
@@ -47,18 +60,9 @@ done
 # start containerd
 systemctl enable --now containerd
 
-# configure download parameters based on architecture
-UNAME_MACHINE="$(/usr/bin/uname -m)"
-if [ "${UNAME_MACHINE}" = "aarch64" ]; then
-    GH_RUNNER_ARCH="arm64"
-    GH_RUNNER_DOWNLOAD_HASH="bec1832fe6d2ed75acf4b7d8f2ce1169239a913b84ab1ded028076c9fa5091b8"
-else
-    GH_RUNNER_ARCH="x64"
-    GH_RUNNER_DOWNLOAD_HASH="93ac1b7ce743ee85b5d386f5c1787385ef07b3d7c728ff66ce0d3813d5f46900"
-fi
-
-GH_RUNNER_FILENAME="actions-runner-linux-${GH_RUNNER_ARCH}-2.320.0.tar.gz"
-GH_RUNNER_DOWNLOAD_URL="https://github.com/actions/runner/releases/download/v2.320.0/${GH_RUNNER_FILENAME}"
+GH_RUNNER_VERSION="2.322.0"
+GH_RUNNER_FILENAME="actions-runner-linux-${GH_RUNNER_ARCH}-${GH_RUNNER_VERSION}.tar.gz"
+GH_RUNNER_DOWNLOAD_URL="https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/${GH_RUNNER_FILENAME}"
 
 curl -OL "${GH_RUNNER_DOWNLOAD_URL}"
 echo "${GH_RUNNER_DOWNLOAD_HASH}  ${GH_RUNNER_FILENAME}" | sha256sum -c
@@ -82,10 +86,41 @@ if [ -z ${GH_RUNNER_DEPENDENCIES+x} ]; then
     "${RUNNER_DIR}/bin/installdependencies.sh"
 fi
 
+# Patch runsvc.sh to use previously downloaded version of Node unless its already patched.
+# This needs to be run as part of the systemd service since the runner can auto-update
+# and we want to patch every time there's an update, not just the initial installation.
+if [ "${OS_NAME}" = "Amazon Linux" ] && [ "${OS_VERSION}" = "2" ]; then
+    RUNNER_SERVICE_NAME="actions.runner.runfinch-finch.$(hostname | cut -d. -f1).service"
+    RUNNER_SERVICE_DROPIN_DIR="/etc/systemd/system/${RUNNER_SERVICE_NAME}.d"
+    RUNNER_SERVICE_DROPIN_FILE="/etc/systemd/system/${RUNNER_SERVICE_NAME}.d/replace-node.conf"
+
+    RUNNER_PATCH_SCRIPT="${HOMEDIR}/replace-node.sh"
+    RUNSVC_PATH="${RUNNER_DIR}/runsvc.sh"
+    ORIGINAL_NODE_PATH="./externals/\\\$nodever/bin/node"
+    SYSTEM_NODE_PATH="/usr/bin/node"
+
+    cat > ${RUNNER_PATCH_SCRIPT} << EOF
+#!/usr/bin/bash
+if grep -q "${ORIGINAL_NODE_PATH}" "${RUNSVC_PATH}"; then
+    sed -e "s|${ORIGINAL_NODE_PATH}|${SYSTEM_NODE_PATH}|g" -i "${RUNSVC_PATH}"
+fi
+EOF
+
+    chmod +x ${RUNNER_PATCH_SCRIPT}
+
+    mkdir -p ${RUNNER_SERVICE_DROPIN_DIR}
+    cat > ${RUNNER_SERVICE_DROPIN_FILE} << EOF
+[Service]
+ExecStartPre=${RUNNER_PATCH_SCRIPT}
+EOF
+
+    systemctl daemon-reload
+fi
+
 # Configure the runner with the registration token, launch the service
 # these commands must NOT be run as root
 sudo -i -u "${USERNAME}" bash <<EOF
-"${RUNNER_DIR}/config.sh" --url "https://github.com/runfinch/${REPO}" --unattended --token "${RUNNER_REG_TOKEN}" --work _work --disableupdate --labels "${LABEL_ARCH},${DISTRO},${OS_VERSION},${LABEL_STAGE}"
+"${RUNNER_DIR}/config.sh" --url "https://github.com/runfinch/${REPO}" --unattended --token "${RUNNER_REG_TOKEN}" --work _work --labels "${LABEL_ARCH},${DISTRO},${OS_VERSION},${LABEL_STAGE}"
 EOF
 
 # these commands need to be run from "runner root" as the root user
