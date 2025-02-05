@@ -129,5 +129,4 @@ cd "${RUNNER_DIR}"
 semanage fcontext -d "${RUNNER_DIR}/runsvc.sh"
 semanage fcontext -a -t "bin_t" "${RUNNER_DIR}/runsvc.sh"
 ./svc.sh install "${USERNAME}"
-restorecon -Fv "${RUNNER_DIR}/runsvc.sh"
 ./svc.sh start
