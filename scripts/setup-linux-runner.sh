@@ -104,6 +104,12 @@ if [ "${OS_NAME}" = "Amazon Linux" ] && [ "${OS_VERSION}" = "2" ]; then
 if grep -q "${ORIGINAL_NODE_PATH}" "${RUNSVC_PATH}"; then
     sed -e "s|${ORIGINAL_NODE_PATH}|${SYSTEM_NODE_PATH}|g" -i "${RUNSVC_PATH}"
 fi
+
+# replace any bundled node binary with a symlink to system node
+find "${RUNNER_DIR}" -wholename "${RUNNER_DIR}/externals/node*/bin/node" | while read line; do
+    rm -rf $line
+    ln -s ${SYSTEM_NODE_PATH} $line
+done
 EOF
 
     chmod +x ${RUNNER_PATCH_SCRIPT}
