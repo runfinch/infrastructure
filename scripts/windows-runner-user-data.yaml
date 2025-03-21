@@ -125,7 +125,8 @@ tasks:
           Invoke-WebRequest -Uri 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl_update_x64.msi'
           Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl_update_x64.msi /L*V C:\WSLInstallation.log /quiet'
           Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
-          Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu'
+          Add-MpPreference -ExclusionPath "C:\Users\ADMINI~1\AppData\Local\Temp\go-build*" -Force
+          Start-Job -ScriptBlock { Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu' }
           sleep 30 # sleep to allow Ubuntu VM to start
           New-NetFirewallRule -DisplayName "WSL" -Direction Inbound -InterfaceAlias "vEthernet (WSL)" -Action Allow
           '@
