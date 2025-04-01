@@ -106,7 +106,7 @@ if grep -q "${ORIGINAL_NODE_PATH}" "${RUNSVC_PATH}"; then
 fi
 
 # replace any bundled node binary with a symlink to system node
-find "${RUNNER_DIR}" -wholename "${RUNNER_DIR}/externals/node*/bin/node" | while read line; do
+find "${RUNNER_DIR}" -wholename "${RUNNER_DIR}/externals*/node*/bin/node" | while read line; do
     rm -rf \$line
     ln -s ${SYSTEM_NODE_PATH} \$line
 done
