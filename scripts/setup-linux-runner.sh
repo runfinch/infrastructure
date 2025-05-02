@@ -134,7 +134,7 @@ EOF
 inotifywait -mr "${RUNNER_DIR}" -e create -e moved_to |
     while read -r directory action file; do
         path="\${directory}\${file}"
-        if [[ "\$path" =~ *"externals.*/node.*"* ]]; then
+        if [[ "\$path" !=~ *"externals.*/node.*"* ]]; then
             continue
         fi
         if [[ "\$(readlink -e ${SYSTEM_NODE_PATH})" == "\$(readlink -e \$file)" ]]; then
