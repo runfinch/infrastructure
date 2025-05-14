@@ -134,15 +134,17 @@ EOF
 inotifywait -mr "${RUNNER_DIR}" -e create -e moved_to |
     while read -r directory action file; do
         path="\${directory}\${file}"
-        if [[ "\$path" !=~ *"externals.*/node.*"* ]]; then
+        if [[ ! "\$path" =~ .*externals.*\/node.* ]]; then
+            echo 'no match for file \${path}, skipping' | systemd-cat -t "node-patcher" -p info
             continue
         fi
         if [[ "\$(readlink -e ${SYSTEM_NODE_PATH})" == "\$(readlink -e \$file)" ]]; then
             # file is already linked properly, skip
+            echo "file \${path} already linked properly, skipping" | systemd-cat -t "node-patcher" -p info
             continue
         fi
 
-        echo 'updating node paths' | systemd-cat -p info
+        echo 'updating node path, triggered by \${path}' | systemd-cat -t "node-patcher" -p info
 
         "${RUNNER_PATCH_SCRIPT}"
     done
