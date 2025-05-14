@@ -33,7 +33,7 @@ if [ "${OS_NAME}" = "Amazon Linux" ]; then
     BASE_PACKAGES="golang zlib-static containerd nerdctl cni-plugins iptables"
     if [ "${OS_VERSION}" = "2" ]; then
         GH_RUNNER_DEPENDENCIES="openssl krb5-libs zlib jq"
-        ADDITIONAL_PACKAGES="policycoreutils-python systemd-rpm-macros ${GH_RUNNER_DEPENDENCIES}"
+        ADDITIONAL_PACKAGES="policycoreutils-python systemd-rpm-macros inotify-tools ${GH_RUNNER_DEPENDENCIES}"
         NODE_VERSION="21.2.0"
         curl -OL "https://d3rnber7ry90et.cloudfront.net/linux-${NODE_DOWNLOAD_ARCH}/node-v${NODE_VERSION}.tar.gz"
         tar -xf node-v${NODE_VERSION}.tar.gz
@@ -99,7 +99,12 @@ if [ "${OS_NAME}" = "Amazon Linux" ] && [ "${OS_VERSION}" = "2" ]; then
     ORIGINAL_NODE_PATH="./externals/\\\$nodever/bin/node"
     SYSTEM_NODE_PATH="/usr/bin/node"
 
-    cat > ${RUNNER_PATCH_SCRIPT} << EOF
+    # Create a one-shot unit that will fix the node paths whenever a new node version is added.
+    # This may happen if the actions runner service autoupdates, but does not restart the systemctl service.
+    ONESHOT_UNIT_NAME="/etc/systemd/system/fix-actions-runner-node.service"
+    WATCHER_SCRIPT="${HOMEDIR}/watcher.sh"
+
+    cat > "${RUNNER_PATCH_SCRIPT}" << EOF
 #!/usr/bin/bash
 if grep -q "${ORIGINAL_NODE_PATH}" "${RUNSVC_PATH}"; then
     sed -e "s|${ORIGINAL_NODE_PATH}|${SYSTEM_NODE_PATH}|g" -i "${RUNSVC_PATH}"
@@ -113,15 +118,49 @@ done
 
 EOF
 
-    chmod +x ${RUNNER_PATCH_SCRIPT}
+    chmod +x "${RUNNER_PATCH_SCRIPT}"
 
-    mkdir -p ${RUNNER_SERVICE_DROPIN_DIR}
-    cat > ${RUNNER_SERVICE_DROPIN_FILE} << EOF
+    mkdir -p "${RUNNER_SERVICE_DROPIN_DIR}"
+    cat > "${RUNNER_SERVICE_DROPIN_FILE}" << EOF
 [Service]
 ExecStartPre=${RUNNER_PATCH_SCRIPT}
 EOF
 
+    # Monitor the $RUNNER_DIR for all file changes. This cannot be scoped down
+    # because inotifywait does not take a file glob itself, and the externals directory
+    # can be suffixed with version numbers (e.g. externals.someversion, not just one externals dir).
+    cat > "${WATCHER_SCRIPT}" << EOF
+#!/usr/bin/bash
+inotifywait -mr "${RUNNER_DIR}" -e create -e moved_to |
+    while read -r directory action file; do
+        path="\${directory}\${file}"
+        if [[ ! "\$path" =~ .*externals.*\/node.* ]]; then
+            echo 'no match for file \${path}, skipping' | systemd-cat -t "node-patcher" -p info
+            continue
+        fi
+        if [[ "\$(readlink -e ${SYSTEM_NODE_PATH})" == "\$(readlink -e \$file)" ]]; then
+            # file is already linked properly, skip
+            echo "file \${path} already linked properly, skipping" | systemd-cat -t "node-patcher" -p info
+            continue
+        fi
+
+        echo 'updating node path, triggered by \${path}' | systemd-cat -t "node-patcher" -p info
+
+        "${RUNNER_PATCH_SCRIPT}"
+    done
+EOF
+
+    chmod +x "${WATCHER_SCRIPT}"
+
+    cat > "${ONESHOT_UNIT_NAME}" << EOF
+[Service]
+Type=oneshot
+Description=GitHub Actions runner node version watcher
+Exec=${WATCHER_SCRIPT}
+EOF
+
     systemctl daemon-reload
+    systemctl enable --now "${ONESHOT_UNIT_NAME}"
 fi
 
 # Configure the runner with the registration token, launch the service
