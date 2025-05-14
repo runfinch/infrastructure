@@ -38,6 +38,8 @@ if [ "${OS_NAME}" = "Amazon Linux" ]; then
         curl -OL "https://d3rnber7ry90et.cloudfront.net/linux-${NODE_DOWNLOAD_ARCH}/node-v${NODE_VERSION}.tar.gz"
         tar -xf node-v${NODE_VERSION}.tar.gz
         mv node-v${NODE_VERSION}/bin/* /usr/bin
+        # enable EPEL repos, required to install inotify-tools package
+        amazon-linux-extras install epel -y
     elif [ "${OS_VERSION}" = "2023" ]; then
         GH_RUNNER_DEPENDENCIES="lttng-ust openssl-libs krb5-libs zlib libicu"
         ADDITIONAL_PACKAGES="policycoreutils-python-utils ${GH_RUNNER_DEPENDENCIES}"
@@ -99,9 +101,10 @@ if [ "${OS_NAME}" = "Amazon Linux" ] && [ "${OS_VERSION}" = "2" ]; then
     ORIGINAL_NODE_PATH="./externals/\\\$nodever/bin/node"
     SYSTEM_NODE_PATH="/usr/bin/node"
 
-    # Create a one-shot unit that will fix the node paths whenever a new node version is added.
-    # This may happen if the actions runner service autoupdates, but does not restart the systemctl service.
-    ONESHOT_UNIT_NAME="/etc/systemd/system/fix-actions-runner-node.service"
+    # Create a systemd service that will fix the node paths whenever a new node version is added.
+    # This may happen if the actions runner service autoupdates, but does not restart the systemctl service
+    # (meaning it does not re-trigger the ExecStartPre command which is inserted via our dropin unit).
+    WATCHER_UNIT_NAME="/etc/systemd/system/fix-actions-runner-node.service"
     WATCHER_SCRIPT="${HOMEDIR}/watcher.sh"
 
     cat > "${RUNNER_PATCH_SCRIPT}" << EOF
@@ -152,15 +155,19 @@ EOF
 
     chmod +x "${WATCHER_SCRIPT}"
 
-    cat > "${ONESHOT_UNIT_NAME}" << EOF
+    cat > "${WATCHER_UNIT_NAME}" << EOF
 [Service]
-Type=oneshot
+ExecStart=${WATCHER_SCRIPT}
+
+[Unit]
 Description=GitHub Actions runner node version watcher
-Exec=${WATCHER_SCRIPT}
+
+[Install]
+WantedBy=multi-user.target
 EOF
 
     systemctl daemon-reload
-    systemctl enable --now "${ONESHOT_UNIT_NAME}"
+    systemctl enable --now "${WATCHER_UNIT_NAME}"
 fi
 
 # Configure the runner with the registration token, launch the service
