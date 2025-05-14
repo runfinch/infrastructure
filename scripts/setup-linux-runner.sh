@@ -49,7 +49,7 @@ RUNNER_DIR="${HOMEDIR}/ar"
 mkdir -p "${RUNNER_DIR}" && cd "${HOMEDIR}"
 
 # TODO: add check for non-Fedora based systems if needed
-yum upgrade
+yum upgrade -y
 yum group install -y "Development Tools"
 # build dependencies for packages
 # this sometimes fails on Amazon Linux 2023, so retry if necessary
