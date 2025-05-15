@@ -12,6 +12,10 @@ import { EventBridgeScanNotifsStack } from './event-bridge-scan-notifs-stack';
 import { PVREReportingStack } from './pvre-reporting-stack';
 import { SSMPatchingStack } from './ssm-patching-stack';
 import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
+import { BuildImageOS, CODEBUILD_ARCHS, toStackName } from './utils';
+import { CodeBuildStack } from './codebuild-stack';
+import * as codebuild from 'aws-cdk-lib/aws-codebuild';
+
 
 export enum ENVIRONMENT_STAGE {
   Beta,
@@ -81,5 +85,18 @@ export class FinchPipelineAppStage extends cdk.Stage {
     new PVREReportingStack(this, 'PVREReportingStack', { terminationProtection: true });
     
     new SSMPatchingStack(this, 'SSMPatchingStack', { terminationProtection: true });
+
+    // Create Ubuntu Codebuild projects for each arch
+    for (const arch of CODEBUILD_ARCHS) {
+      new CodeBuildStack(this, `CodeBuildStack-${toStackName(arch)}`, {
+        env: props.env,
+        projectName: `finch-${arch}-instance`,
+        region: 'us-west-2',
+        arch: arch,
+        amiSearchString: 'ubuntu*22.04*',
+        buildImageOS: BuildImageOS.LINUX,
+        environmentType: codebuild.EnvironmentType.LINUX_EC2,
+      });
+    }
   }
 }

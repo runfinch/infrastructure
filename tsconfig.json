@@ -11,6 +11,7 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "resolveJsonModule": true,
+    "outDir": "./dist",
   },
   "exclude": [
     "node_modules",
