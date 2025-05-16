@@ -1,9 +1,9 @@
 import * as cdk from 'aws-cdk-lib';
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import { Construct } from 'constructs';
 import { Key } from 'aws-cdk-lib/aws-kms';
-import { toStackName, GITHUB_ALLOWLISTED_ACCOUNT_IDS, BuildImageOS, LinuxAMIBuildImage, WindowsAMIBuildImage, MacAMIBuildImage } from './utils';
+import { Construct } from 'constructs';
+import { BuildImageOS, GITHUB_ALLOWLISTED_ACCOUNT_IDS, LinuxAMIBuildImage, MacAMIBuildImage, toStackName, WindowsAMIBuildImage } from './utils';
 
 const webhookFiltersArr: codebuild.FilterGroup[] = [];
 
@@ -19,16 +19,22 @@ const githHubSource = codebuild.Source.gitHub({
     webhookFilters: webhookFiltersArr,
 });
 
+interface ImageFilterProps {
+    'virtualization-type': string[],
+    'root-device-type': string[],
+    'owner-alias': string[],
+}
+
 /**
  * Default properties for CodeBuildStack configuration.
  * Contains static readonly properties that define default values for image filters,
  * fleet configuration, and project environment settings.
  */
 class CodeBuildStackDefaultProps {
-    static readonly imageFilterProps = {
-      virtualizationType: ['hvm'],
-      rootDeviceType: ['ebs'],
-      ownerAlias: ['amazon'],
+    static readonly imageFilterProps: ImageFilterProps = {
+      'virtualization-type': ['hvm'],
+      'root-device-type': ['ebs'],
+      'owner-alias': ['amazon'],
     };
     static readonly fleetProps = {
         computeType: codebuild.FleetComputeType.MEDIUM,
@@ -45,14 +51,11 @@ class CodeBuildStackProps {
     projectName: string;
     region: string;
     arch: string;
+    operatingSystem: string;
     amiSearchString: string;
     environmentType: codebuild.EnvironmentType;
     buildImageOS: BuildImageOS;
-    imageFilterProps?: {
-        virtualizationType: string[],
-        rootDeviceType: string[],
-        ownerAlias: string[],
-    };
+    imageFilterProps?: ImageFilterProps;
     fleetProps?: {
         computeType: codebuild.FleetComputeType,
         baseCapacity: number,
@@ -70,13 +73,14 @@ export class CodeBuildStack extends cdk.Stack {
     }
 
     private createBuildProject(props: CodeBuildStackProps, id: string): codebuild.Project {
-        const machineImage = new ec2.LookupMachineImage({
+        const machineImageProps = {
             name: props.amiSearchString,
             filters: {
                 ...(props.imageFilterProps || CodeBuildStackDefaultProps.imageFilterProps),
                 'architecture': [props.arch],
             }
-        });
+        }
+        const machineImage = new ec2.LookupMachineImage(machineImageProps);
 
         const fleet = new codebuild.Fleet(this, `Fleet-${toStackName(props.arch)}`, {
             ...(props.fleetProps || CodeBuildStackDefaultProps.fleetProps),
@@ -98,7 +102,7 @@ export class CodeBuildStack extends cdk.Stack {
             },
             encryptionKey: new Key(this, `codebuild-${toStackName(props.arch)}-key-${props.region}`, {
                 description: 'Kms Key to encrypt data-at-rest',
-                alias: `finch-${props.arch}-kms-${props.region}`,
+                alias: `finch-${props.operatingSystem}-${props.arch}-kms-${props.region}`,
                 enabled: true,
             })
         });
