@@ -51,7 +51,7 @@ class CodeBuildStackDefaultProps {
     baseCapacity: 1
   };
   static readonly projectEnvironmentProps = {
-    computeType: codebuild.ComputeType.MEDIUM,
+    computeType: codebuild.ComputeType.MEDIUM
   };
 }
 
@@ -83,6 +83,17 @@ export class CodeBuildStack extends cdk.Stack {
   private createBuildProject(props: CodeBuildStackProps, id: string): codebuild.Project {
     const platformId: string = `${props.operatingSystem}-${toStackName(props.arch)}`;
 
+    const secretArn = this.formatArn({
+      service: 'secretsmanager',
+      resource: 'secret',
+      resourceName: `codebuild-github-access-token-??????`,
+      arnFormat: cdk.ArnFormat.COLON_RESOURCE_NAME
+    });
+
+    new codebuild.GitHubSourceCredentials(this, `code-build-${platformId}-credentials`, {
+      accessToken: cdk.SecretValue.secretsManager(secretArn)
+    });
+
     const machineImageProps = {
       name: props.amiSearchString,
       filters: {
@@ -111,7 +122,7 @@ export class CodeBuildStack extends cdk.Stack {
     cfnFleet.addPropertyOverride('ImageId', imageId);
     cfnFleet.addPropertyOverride('FleetServiceRole', fleetServiceRole.roleArn);
 
-    return new codebuild.Project(this, id, {
+    const codebuildProject = new codebuild.Project(this, id, {
       projectName: props.projectName,
       source: githHubSource,
       environment: {
@@ -125,6 +136,15 @@ export class CodeBuildStack extends cdk.Stack {
         enabled: true
       })
     });
+
+    codebuildProject.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['secretsmanager:GetSecretValue'],
+        resources: [secretArn]
+      })
+    );
+
+    return codebuildProject;
   }
 
   private getBuildImageByOS(
