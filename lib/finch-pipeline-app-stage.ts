@@ -1,21 +1,20 @@
 import * as cdk from 'aws-cdk-lib';
 import { CfnOutput } from 'aws-cdk-lib';
+import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { PlatformType, RunnerProps } from '../config/runner-config';
 import { ArtifactBucketCloudfrontStack } from './artifact-bucket-cloudfront';
 import { ASGRunnerStack } from './asg-runner-stack';
+import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
+import { CodeBuildStack } from './codebuild-stack';
 import { ContinuousIntegrationStack } from './continuous-integration-stack';
 import { ECRRepositoryStack } from './ecr-repo-stack';
 import { EventBridgeScanNotifsStack } from './event-bridge-scan-notifs-stack';
 import { PVREReportingStack } from './pvre-reporting-stack';
 import { SSMPatchingStack } from './ssm-patching-stack';
-import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
-import { BuildImageOS, CODEBUILD_ARCHS, toStackName } from './utils';
-import { CodeBuildStack } from './codebuild-stack';
-import * as codebuild from 'aws-cdk-lib/aws-codebuild';
-
+import { BuildImageOS, CODEBUILD_STACKS, toStackName } from './utils';
 
 export enum ENVIRONMENT_STAGE {
   Beta,
@@ -83,19 +82,20 @@ export class FinchPipelineAppStage extends cdk.Stage {
     }
 
     new PVREReportingStack(this, 'PVREReportingStack', { terminationProtection: true });
-    
+
     new SSMPatchingStack(this, 'SSMPatchingStack', { terminationProtection: true });
 
     // Create Ubuntu Codebuild projects for each arch
-    for (const arch of CODEBUILD_ARCHS) {
-      new CodeBuildStack(this, `CodeBuildStack-${toStackName(arch)}`, {
+    for (const { arch, operatingSystem, amiSearchString } of CODEBUILD_STACKS) {
+      new CodeBuildStack(this, `CodeBuildStack-${operatingSystem}-${toStackName(arch)}`, {
         env: props.env,
         projectName: `finch-${arch}-instance`,
         region: 'us-west-2',
-        arch: arch,
-        amiSearchString: 'ubuntu*22.04*',
+        arch,
+        amiSearchString,
+        operatingSystem,
         buildImageOS: BuildImageOS.LINUX,
-        environmentType: codebuild.EnvironmentType.LINUX_EC2,
+        environmentType: codebuild.EnvironmentType.LINUX_EC2
       });
     }
   }

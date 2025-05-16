@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
-import { Template, Match } from 'aws-cdk-lib/assertions';
-import { CodeBuildStack } from '../lib/codebuild-stack';
+import { Match, Template } from 'aws-cdk-lib/assertions';
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
+import { CodeBuildStack } from '../lib/codebuild-stack';
 import { BuildImageOS } from '../lib/utils';
 
 describe('CodeBuildStack', () => {
@@ -14,7 +14,8 @@ describe('CodeBuildStack', () => {
         },
         projectName: 'test-project',
         region: 'us-west-2',
-        arch: 'x86_64_ubuntu',
+        operatingSystem: "ubuntu",
+        arch: 'x86_64',
         amiSearchString: 'ubuntu*22.04*',
         environmentType: codebuild.EnvironmentType.LINUX_EC2,
         buildImageOS: BuildImageOS.LINUX,
@@ -52,7 +53,7 @@ describe('CodeBuildStack', () => {
 
     // Assert that the stack creates a KMS alias
     template.hasResourceProperties('AWS::KMS::Alias', {
-      AliasName: Match.stringLikeRegexp('alias/finch-x86_64_ubuntu-kms-us-west-2')
+      AliasName: Match.stringLikeRegexp('alias/finch-ubuntu-x86_64-kms-us-west-2')
     });
 
     // Check resource count
