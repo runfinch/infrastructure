@@ -1,7 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import * as iam from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Construct } from 'constructs';
 import { BuildImageOS, GITHUB_ALLOWLISTED_ACCOUNT_IDS, LinuxAMIBuildImage, MacAMIBuildImage, toStackName, WindowsAMIBuildImage } from './utils';
@@ -74,8 +73,6 @@ export class CodeBuildStack extends cdk.Stack {
     }
 
     private createBuildProject(props: CodeBuildStackProps, id: string): codebuild.Project {
-        const platformId: string = `${props.operatingSystem}-${toStackName(props.arch)}`;
-        
         const machineImageProps = {
             name: props.amiSearchString,
             filters: {
@@ -84,14 +81,6 @@ export class CodeBuildStack extends cdk.Stack {
             }
         }
         const machineImage = new ec2.LookupMachineImage(machineImageProps);
-
-        const fleetServiceRole = new iam.Role(this, `FleetServiceRole-${platformId}`, {
-            assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
-            managedPolicies: [
-                iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2FullAccess'),
-                iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore')
-            ]
-        });
 
         const fleet = new codebuild.Fleet(this, `Fleet-${toStackName(props.arch)}`, {
             ...(props.fleetProps || CodeBuildStackDefaultProps.fleetProps),
@@ -102,8 +91,7 @@ export class CodeBuildStack extends cdk.Stack {
         
         const cfnFleet = fleet.node.defaultChild as cdk.CfnResource;
         cfnFleet.addPropertyOverride('ImageId', imageId);
-        cfnFleet.addPropertyOverride('FleetServiceRole', fleetServiceRole.roleArn);
-
+    
         return new codebuild.Project(this, id, {
             projectName: props.projectName,
             source: githHubSource,
@@ -112,9 +100,9 @@ export class CodeBuildStack extends cdk.Stack {
                 fleet: fleet,
                 buildImage: this.getBuildImageByOS(props.buildImageOS, imageId),
             },
-            encryptionKey: new Key(this, `codebuild-${platformId}-key-${props.region}`, {
+            encryptionKey: new Key(this, `codebuild-${toStackName(props.arch)}-key-${props.region}`, {
                 description: 'Kms Key to encrypt data-at-rest',
-                alias: `finch-${platformId}-kms-${props.region}`,
+                alias: `finch-${props.operatingSystem}-${props.arch}-kms-${props.region}`,
                 enabled: true,
             })
         });
