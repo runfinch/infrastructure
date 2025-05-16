@@ -1,33 +1,21 @@
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 
-export enum BuildImageOS {
-  LINUX = 'linux',
-  WINDOWS = 'windows',
-  MAC = 'mac'
-}
-
-export interface CodeBuildStackArgs {
+interface CodeBuildStack {
   operatingSystem: string;
   arch: string;
   amiSearchString: string;
-  environmentType: codebuild.EnvironmentType;
-  buildImageOS: BuildImageOS;
 }
 
-export const CODEBUILD_STACKS: CodeBuildStackArgs[] = [
+export const CODEBUILD_STACKS: CodeBuildStack[] = [
   {
     operatingSystem: 'ubuntu',
     arch: 'x86_64',
-    amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*22.04*',
-    environmentType: codebuild.EnvironmentType.LINUX_EC2,
-    buildImageOS: BuildImageOS.LINUX
+    amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*22.04*'
   },
   {
     operatingSystem: 'ubuntu',
     arch: 'arm64',
-    amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*22.04*',
-    environmentType: codebuild.EnvironmentType.ARM_EC2,
-    buildImageOS: BuildImageOS.LINUX
+    amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*22.04*'
   }
 ];
 
@@ -58,14 +46,20 @@ export const toStackName = (name: string) => {
   return name.replace(/_/g, '-');
 };
 
+export enum BuildImageOS {
+  LINUX = 'linux',
+  WINDOWS = 'windows',
+  MAC = 'mac'
+}
+
 // @ts-expect-error Extending private class
 export class LinuxAMIBuildImage extends codebuild.LinuxBuildImage implements codebuild.IBuildImage {
   declare type: codebuild.EnvironmentType;
 
-  constructor(imageId: string, environmentType: codebuild.EnvironmentType) {
+  constructor(imageId: string) {
     // @ts-expect-error Extending private class
     super({ imageId });
-    this.type = environmentType;
+    this.type = codebuild.EnvironmentType.LINUX_EC2;
   }
 }
 
@@ -73,10 +67,10 @@ export class LinuxAMIBuildImage extends codebuild.LinuxBuildImage implements cod
 export class WindowsAMIBuildImage extends codebuild.WindowsBuildImage implements codebuild.IBuildImage {
   declare type: codebuild.EnvironmentType;
 
-  constructor(imageId: string, environmentType: codebuild.EnvironmentType) {
+  constructor(imageId: string) {
     // @ts-expect-error Extending private class
     super({ imageId });
-    this.type = environmentType;
+    this.type = codebuild.EnvironmentType.WINDOWS_EC2;
   }
 }
 
@@ -84,9 +78,9 @@ export class WindowsAMIBuildImage extends codebuild.WindowsBuildImage implements
 export class MacAMIBuildImage extends codebuild.LinuxBuildImage implements codebuild.IBuildImage {
   declare type: codebuild.EnvironmentType;
 
-  constructor(imageId: string, environmentType: codebuild.EnvironmentType) {
+  constructor(imageId: string) {
     // @ts-expect-error Extending private class
     super({ imageId });
-    this.type = environmentType;
+    this.type = codebuild.EnvironmentType.MAC_ARM;
   }
 }

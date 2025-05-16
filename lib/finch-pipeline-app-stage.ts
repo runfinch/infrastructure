@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { CfnOutput } from 'aws-cdk-lib';
+import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
@@ -13,7 +14,7 @@ import { ECRRepositoryStack } from './ecr-repo-stack';
 import { EventBridgeScanNotifsStack } from './event-bridge-scan-notifs-stack';
 import { PVREReportingStack } from './pvre-reporting-stack';
 import { SSMPatchingStack } from './ssm-patching-stack';
-import { CODEBUILD_STACKS, toStackName } from './utils';
+import { BuildImageOS, CODEBUILD_STACKS, toStackName } from './utils';
 
 export enum ENVIRONMENT_STAGE {
   Beta,
@@ -85,7 +86,7 @@ export class FinchPipelineAppStage extends cdk.Stage {
     new SSMPatchingStack(this, 'SSMPatchingStack', { terminationProtection: true });
 
     // Create Ubuntu Codebuild projects for each arch
-    for (const { arch, operatingSystem, amiSearchString, environmentType, buildImageOS } of CODEBUILD_STACKS) {
+    for (const { arch, operatingSystem, amiSearchString } of CODEBUILD_STACKS) {
       new CodeBuildStack(this, `CodeBuildStack-${operatingSystem}-${toStackName(arch)}`, {
         env: props.env,
         projectName: `finch-${arch}-instance`,
@@ -93,8 +94,8 @@ export class FinchPipelineAppStage extends cdk.Stage {
         arch,
         amiSearchString,
         operatingSystem,
-        buildImageOS: buildImageOS,
-        environmentType: environmentType
+        buildImageOS: BuildImageOS.LINUX,
+        environmentType: codebuild.EnvironmentType.LINUX_EC2
       });
     }
   }
