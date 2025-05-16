@@ -26,7 +26,9 @@ const githHubSource = codebuild.Source.gitHub({
   owner: 'runfinch',
   repo: 'finch',
   webhook: true,
-  webhookFilters: webhookFiltersArr
+  webhookFilters: webhookFiltersArr,
+  fetchSubmodules: true,
+  cloneDepth: 0,
 });
 
 interface ImageFilterProps {
@@ -91,7 +93,7 @@ export class CodeBuildStack extends cdk.Stack {
     });
 
     new codebuild.GitHubSourceCredentials(this, `code-build-${platformId}-credentials`, {
-      accessToken: cdk.SecretValue.secretsManager(secretArn)
+      accessToken: cdk.SecretValue.secretsManager('codebuild-github-access-token')
     });
 
     const machineImageProps = {
