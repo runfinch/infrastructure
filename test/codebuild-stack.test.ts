@@ -8,17 +8,17 @@ describe('CodeBuildStack', () => {
   test('synthesizes the way we expect', () => {
     const app = new cdk.App();
     const stack = new CodeBuildStack(app, 'TestStack', {
-        env: {
-            account: '123456789012',
-            region: 'us-east-1'
-        },
-        projectName: 'test-project',
-        region: 'us-west-2',
-        operatingSystem: "ubuntu",
-        arch: 'x86_64',
-        amiSearchString: 'ubuntu*22.04*',
-        environmentType: codebuild.EnvironmentType.LINUX_EC2,
-        buildImageOS: BuildImageOS.LINUX,
+      env: {
+        account: '123456789012',
+        region: 'us-east-1'
+      },
+      projectName: 'test-project',
+      region: 'us-west-2',
+      operatingSystem: 'ubuntu',
+      arch: 'x86_64',
+      amiSearchString: 'ubuntu*22.04*',
+      environmentType: codebuild.EnvironmentType.LINUX_EC2,
+      buildImageOS: BuildImageOS.LINUX
     });
     const template = Template.fromStack(stack);
 
@@ -45,6 +45,18 @@ describe('CodeBuildStack', () => {
       EnvironmentType: 'LINUX_EC2'
     });
 
+    // Assert that the stack creates a Fleet service role
+    template.hasResourceProperties('AWS::IAM::Role', {
+      ManagedPolicyArns: Match.arrayWith([
+        {
+          'Fn::Join': ['', Match.arrayWith([':iam::aws:policy/AmazonEC2FullAccess'])]
+        },
+        {
+          'Fn::Join': ['', Match.arrayWith([':iam::aws:policy/AmazonSSMManagedInstanceCore'])]
+        }
+      ])
+    });
+
     // Assert that the stack creates a KMS key
     template.hasResourceProperties('AWS::KMS::Key', {
       Description: 'Kms Key to encrypt data-at-rest',
@@ -53,7 +65,7 @@ describe('CodeBuildStack', () => {
 
     // Assert that the stack creates a KMS alias
     template.hasResourceProperties('AWS::KMS::Alias', {
-      AliasName: Match.stringLikeRegexp('alias/finch-ubuntu-x86_64-kms-us-west-2')
+      AliasName: Match.stringLikeRegexp('alias/finch-ubuntu-x86-64-kms-us-west-2')
     });
 
     // Check resource count
