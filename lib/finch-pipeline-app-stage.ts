@@ -89,9 +89,14 @@ export class FinchPipelineAppStage extends cdk.Stage {
     // CodeBuild credentials are account-wide, so creating them multiple times within the for
     // loop causes an error.
     // TODO: refactor CodeBuildStack into CodeBuildProjects and loop inside of the constructor.
-    new codebuild.GitHubSourceCredentials(this, `code-build-credentials`, {
-      accessToken: cdk.SecretValue.secretsManager('codebuild-github-access-token')
-    });
+    new (class CodeBuildCredentialsStack extends cdk.Stack {
+      constructor(scope: Construct, id: string) {
+        super(scope, id, props);
+            new codebuild.GitHubSourceCredentials(this, `code-build-credentials`, {
+              accessToken: cdk.SecretValue.secretsManager('codebuild-github-access-token')
+            });
+        }
+    })(this, "CodeBuildStack-credentials");
 
     for (const { arch, operatingSystem, amiSearchString, environmentType, buildImageOS } of CODEBUILD_STACKS) {
       new CodeBuildStack(this, `CodeBuildStack-${operatingSystem}-${toStackName(arch)}`, {
