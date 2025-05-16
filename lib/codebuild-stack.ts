@@ -92,10 +92,6 @@ export class CodeBuildStack extends cdk.Stack {
       arnFormat: cdk.ArnFormat.COLON_RESOURCE_NAME
     });
 
-    new codebuild.GitHubSourceCredentials(this, `code-build-${platformId}-credentials`, {
-      accessToken: cdk.SecretValue.secretsManager('codebuild-github-access-token')
-    });
-
     const machineImageProps = {
       name: props.amiSearchString,
       filters: {
