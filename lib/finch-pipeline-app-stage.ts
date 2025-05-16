@@ -7,13 +7,13 @@ import { PlatformType, RunnerProps } from '../config/runner-config';
 import { ArtifactBucketCloudfrontStack } from './artifact-bucket-cloudfront';
 import { ASGRunnerStack } from './asg-runner-stack';
 import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
-import { CodeBuildStack } from './codebuild-stack';
+// import { CodeBuildStack } from './codebuild-stack';
 import { ContinuousIntegrationStack } from './continuous-integration-stack';
 import { ECRRepositoryStack } from './ecr-repo-stack';
 import { EventBridgeScanNotifsStack } from './event-bridge-scan-notifs-stack';
 import { PVREReportingStack } from './pvre-reporting-stack';
 import { SSMPatchingStack } from './ssm-patching-stack';
-import { CODEBUILD_STACKS, toStackName } from './utils';
+// import { CODEBUILD_STACKS, toStackName } from './utils';
 
 export enum ENVIRONMENT_STAGE {
   Beta,
@@ -85,17 +85,17 @@ export class FinchPipelineAppStage extends cdk.Stage {
     new SSMPatchingStack(this, 'SSMPatchingStack', { terminationProtection: true });
 
     // Create Ubuntu Codebuild projects for each arch
-    for (const { arch, operatingSystem, amiSearchString, environmentType, buildImageOS } of CODEBUILD_STACKS) {
-      new CodeBuildStack(this, `CodeBuildStack-${operatingSystem}-${toStackName(arch)}`, {
-        env: props.env,
-        projectName: `finch-${arch}-instance`,
-        region: 'us-west-2',
-        arch,
-        amiSearchString,
-        operatingSystem,
-        buildImageOS: buildImageOS,
-        environmentType: environmentType
-      });
-    }
+    // for (const { arch, operatingSystem, amiSearchString, environmentType, buildImageOS } of CODEBUILD_STACKS) {
+    //   new CodeBuildStack(this, `CodeBuildStack-${operatingSystem}-${toStackName(arch)}`, {
+    //     env: props.env,
+    //     projectName: `finch-${arch}-instance`,
+    //     region: 'us-west-2',
+    //     arch,
+    //     amiSearchString,
+    //     operatingSystem,
+    //     buildImageOS: buildImageOS,
+    //     environmentType: environmentType
+    //   });
+    // }
   }
 }
