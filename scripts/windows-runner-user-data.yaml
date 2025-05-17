@@ -119,8 +119,8 @@ tasks:
           $ServiceName=(Get-Service actions.runner.*).name
           $startupscript = @'
           Start-Transcript -Path "C:\StartupScript.log" -Append
-          Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.2.4/wsl.2.2.4.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.2.4.0.x64.msi'
-          Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.2.4.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
+          Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.4.13/wsl.2.4.13.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.4.13.0.x64.msi'
+          Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.4.13.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
           # Update the WSL kernel
           Invoke-WebRequest -Uri 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl_update_x64.msi'
           Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl_update_x64.msi /L*V C:\WSLInstallation.log /quiet'
