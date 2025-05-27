@@ -55,6 +55,7 @@ class CodeBuildStackDefaultProps {
   static readonly projectEnvironmentProps = {
     computeType: codebuild.ComputeType.MEDIUM
   };
+  static readonly terminationProtection: boolean = true;
 }
 
 class CodeBuildStackProps {
@@ -78,7 +79,10 @@ class CodeBuildStackProps {
 
 export class CodeBuildStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: CodeBuildStackProps) {
-    super(scope, id, props);
+    super(scope, id, {
+      ...props,
+      terminationProtection: CodeBuildStackDefaultProps.terminationProtection,
+    });
     this.createBuildProject(props, id);
   }
 
