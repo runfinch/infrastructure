@@ -91,7 +91,10 @@ export class FinchPipelineAppStage extends cdk.Stage {
     // TODO: refactor CodeBuildStack into CodeBuildProjects and loop inside of the constructor.
     const codebuildCredsStack = new (class CodeBuildCredentialsStack extends cdk.Stack {
       constructor(scope: Construct, id: string) {
-        super(scope, id, props);
+        super(scope, id, {
+          ...props,
+          terminationProtection: true,
+        });
         new codebuild.GitHubSourceCredentials(this, `code-build-credentials`, {
           accessToken: cdk.SecretValue.secretsManager('codebuild-github-access-token')
         });
