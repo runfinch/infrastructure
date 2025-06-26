@@ -30,6 +30,12 @@ export class ContinuousIntegrationStack extends cdk.Stack {
       description: 'This role is used by GitHub Actions',
       maxSessionDuration: cdk.Duration.hours(1)
     });
+    githubActionsRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ['cloudfront:CreateInvalidation'],
+        resources: ['*']
+      })
+    );
 
     // Override docs: https://docs.aws.amazon.com/cdk/v2/guide/cfn_layer.html#cfn_layer_raw
     // Condition from: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub
