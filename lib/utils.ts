@@ -90,21 +90,3 @@ export class MacAMIBuildImage extends codebuild.LinuxBuildImage implements codeb
     this.type = environmentType;
   }
 }
-
-export const getGitHubActionsRolePolicies = () => {
-  return [
-    {
-      policyName: 'CloudfrontInvalidate',
-      policyDocument: {
-        Version: '2012-10-17',
-        Statement: [
-          {
-            Effect: 'Allow',
-            Action: ['cloudfront:CreateInvalidation'],
-            Resource: ["*"],
-          },
-        ],
-      },
-    },
-  ];
-};

@@ -102,7 +102,7 @@ export class FinchPipelineAppStage extends cdk.Stage {
     })(this, 'CodeBuildStack-credentials');
 
     for (const { arch, operatingSystem, amiSearchString, environmentType, buildImageOS } of CODEBUILD_STACKS) {
-      const codeBuildStack = new CodeBuildStack(this, `CodeBuildStack-${operatingSystem}-${toStackName(arch)}-${props.environmentStage}`, {
+      const codeBuildStack = new CodeBuildStack(this, `CodeBuildStack-${operatingSystem}-${toStackName(arch)}`, {
         env: props.env,
         projectName: `finch-${arch}-${props.environmentStage}-instance`,
         region: 'us-west-2',
