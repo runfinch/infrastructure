@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 
 import { CloudfrontCdn } from './cloudfront_cdn';
 import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-protection';
+import { getGitHubActionsRolePolicies } from './utils';
 
 interface ContinuousIntegrationStackProps extends cdk.StackProps {
   rootfsEcrRepository: ecr.Repository;
@@ -40,6 +41,7 @@ export class ContinuousIntegrationStack extends cdk.Stack {
         'token.actions.githubusercontent.com:sub': 'repo:runfinch/*'
       }
     });
+    cfnRole.policies = getGitHubActionsRolePolicies();
 
     const bucketName = `finch-dependencies-${stage.toLowerCase()}-${cdk.Stack.of(this)?.account}`;
 
