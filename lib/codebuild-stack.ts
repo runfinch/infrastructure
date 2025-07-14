@@ -31,15 +31,6 @@ const githHubSource = codebuild.Source.gitHub({
   cloneDepth: 0,
 });
 
-const githHubSourceDaemon = codebuild.Source.gitHub({
-  owner: 'runfinch',
-  repo: 'finch-daemon',
-  webhook: true,
-  webhookFilters: webhookFiltersArr,
-  fetchSubmodules: true,
-  cloneDepth: 0,
-});
-
 interface ImageFilterProps {
   'virtualization-type': string[];
   'root-device-type': string[];
@@ -68,7 +59,6 @@ class CodeBuildStackDefaultProps {
 }
 
 class CodeBuildStackProps {
-  repo: string;
   env: cdk.Environment | undefined;
   projectName: string;
   region: string;
@@ -82,7 +72,6 @@ class CodeBuildStackProps {
     computeType: codebuild.FleetComputeType;
     baseCapacity: number;
   };
-  buildImageString?: codebuild.IBuildImage;
   projectEnvironmentProps?: {
     computeType: codebuild.ComputeType;
   };
@@ -107,6 +96,15 @@ export class CodeBuildStack extends cdk.Stack {
       arnFormat: cdk.ArnFormat.COLON_RESOURCE_NAME
     });
 
+    const machineImageProps = {
+      name: props.amiSearchString,
+      filters: {
+        ...(props.imageFilterProps || CodeBuildStackDefaultProps.imageFilterProps),
+        architecture: [props.arch]
+      }
+    };
+    const machineImage = new ec2.LookupMachineImage(machineImageProps);
+
     const fleetServiceRole = new iam.Role(this, `FleetServiceRole-${platformId}`, {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
       managedPolicies: [
@@ -120,47 +118,19 @@ export class CodeBuildStack extends cdk.Stack {
       environmentType: props.environmentType
     });
 
-    let buildImage: codebuild.IBuildImage;
-    let imageId: string;
-    let githubSource: codebuild.ISource;
-
-    if (!props.amiSearchString) {
-      // For finch-daemon (macOS), use the buildImageString directly
-      buildImage = props.buildImageString!;
-      // Empty string for macOS since we don't need an ImageId
-      imageId = ""; 
-    } else {
-      // For all other projects, look up the AMI
-      const machineImageProps = {
-        name: props.amiSearchString,
-        filters: {
-          ...(props.imageFilterProps || CodeBuildStackDefaultProps.imageFilterProps),
-          architecture: [props.arch]
-        }
-      };
-      const machineImage = new ec2.LookupMachineImage(machineImageProps);
-      imageId = machineImage.getImage(this).imageId;
-      buildImage = this.getBuildImageByOS(props.buildImageOS, props.environmentType, imageId);
-    }
-
-    githubSource = props.repo == "finch-daemon" ? githHubSourceDaemon : githHubSource;
+    const imageId: string = machineImage.getImage(this).imageId;
 
     const cfnFleet = fleet.node.defaultChild as cdk.CfnResource;
-    
-    // Only set ImageId if it's not empty (skip for macOS)
-    if (imageId) {
-      cfnFleet.addPropertyOverride('ImageId', imageId);
-    }
-    
+    cfnFleet.addPropertyOverride('ImageId', imageId);
     cfnFleet.addPropertyOverride('FleetServiceRole', fleetServiceRole.roleArn);
 
     const codebuildProject = new codebuild.Project(this, id, {
       projectName: props.projectName,
-      source: githubSource,
+      source: githHubSource,
       environment: {
         ...(props.projectEnvironmentProps || CodeBuildStackDefaultProps.projectEnvironmentProps),
         fleet: fleet,
-        buildImage: buildImage
+        buildImage: this.getBuildImageByOS(props.buildImageOS, props.environmentType, imageId)
       },
       encryptionKey: new Key(this, `codebuild-${platformId}-key-${props.region}`, {
         description: 'Kms Key to encrypt data-at-rest',

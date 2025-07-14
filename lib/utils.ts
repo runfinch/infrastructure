@@ -7,25 +7,15 @@ export enum BuildImageOS {
 }
 
 export interface CodeBuildStackArgs {
-  project: string;
   operatingSystem: string;
   arch: string;
   amiSearchString: string;
   environmentType: codebuild.EnvironmentType;
   buildImageOS: BuildImageOS;
-  fleetProps?: {
-    computeType: codebuild.FleetComputeType;
-    baseCapacity: number;
-  };
-  buildImageString?: codebuild.IBuildImage,
-  projectEnvironmentProps?: {
-    computeType: codebuild.ComputeType;
-  };
 }
 
 export const CODEBUILD_STACKS: CodeBuildStackArgs[] = [
   {
-    project: 'finch',
     operatingSystem: 'ubuntu',
     arch: 'x86_64',
     amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*22.04*',
@@ -33,21 +23,11 @@ export const CODEBUILD_STACKS: CodeBuildStackArgs[] = [
     buildImageOS: BuildImageOS.LINUX
   },
   {
-    project: 'finch',
     operatingSystem: 'ubuntu',
     arch: 'arm64',
     amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*22.04*',
     environmentType: codebuild.EnvironmentType.ARM_EC2,
     buildImageOS: BuildImageOS.LINUX
-  },
-  {
-    project: 'finch-daemon',
-    operatingSystem: 'macOS',
-    arch: 'arm64',
-    amiSearchString: "", // Empty string since we're using buildImageString directly
-    environmentType: codebuild.EnvironmentType.MAC_ARM,
-    buildImageOS: BuildImageOS.MAC,
-    buildImageString: codebuild.MacBuildImage.BASE_14
   }
 ];
 
