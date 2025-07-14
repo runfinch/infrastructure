@@ -9,7 +9,6 @@ describe('CodeBuildStack', () => {
   test('synthesizes the way we expect', () => {
     const app = new cdk.App();
     const codebuildStackArgs: CodeBuildStackArgs = {
-      project: 'finch',
       operatingSystem: 'ubuntu',
       arch: 'x86_64',
       amiSearchString: 'ubuntu*22.04*',
@@ -22,8 +21,7 @@ describe('CodeBuildStack', () => {
         account: '123456789012',
         region: 'us-east-1'
       },
-      projectName: codebuildStackArgs.project,
-      repo: codebuildStackArgs.project,
+      projectName: 'test-project',
       region: 'us-west-2',
       ...codebuildStackArgs
     });
@@ -40,8 +38,7 @@ describe('CodeBuildStack', () => {
           account: '123456789012',
           region: 'us-east-1'
         },
-        projectName: codebuildStackArgs.project,
-        repo: codebuildStackArgs.project,
+        projectName: 'test-project',
         region: 'us-west-2',
         ...codebuildStackArgs
       });
@@ -53,49 +50,27 @@ describe('CodeBuildStack', () => {
 });
 
 const validateTemplate = (codebuildStack: CodeBuildStackArgs, template: Template) => {
-  let imageMatcher;
-  if (codebuildStack.amiSearchString === "") {
-    // For macOS builds, match only the base image versions (14 or 15)
-    imageMatcher = Match.stringLikeRegexp('aws/codebuild/macos-arm-base:1[45]$');
-  } else {
-    // For regular builds, expect an AMI ID
-    imageMatcher = Match.stringLikeRegexp('ami-1234');
-  }
-
-  // Assert that the stack creates a Project
+  // Assert that the stack creates a Fleet
   template.hasResourceProperties('AWS::CodeBuild::Project', {
-    Name: codebuildStack.project,
+    Name: 'test-project',
     Environment: {
       Type: codebuildStack.environmentType,
-      ComputeType: codebuildStack.projectEnvironmentProps?.computeType || 'BUILD_GENERAL1_MEDIUM',
-      Image: imageMatcher,
+      ComputeType: 'BUILD_GENERAL1_MEDIUM',
+      Image: Match.stringLikeRegexp('ami-1234'),
     },
     Source: {
       Type: 'GITHUB',
-      Location: codebuildStack.project === 'finch-daemon' 
-        ? 'https://github.com/runfinch/finch-daemon.git'
-        : 'https://github.com/runfinch/finch.git',
+      Location: 'https://github.com/runfinch/finch.git',
       ReportBuildStatus: true
     }
   });
 
   // Assert that the stack creates a Fleet
-  if (codebuildStack.amiSearchString !== "") {
-    // For non-macOS builds, expect ImageId property
-    template.hasResourceProperties('AWS::CodeBuild::Fleet', {
-      BaseCapacity: codebuildStack.fleetProps?.baseCapacity || 1,
-      ComputeType: codebuildStack.fleetProps?.computeType || 'BUILD_GENERAL1_MEDIUM',
-      EnvironmentType: codebuildStack.environmentType,
-      ImageId: Match.anyValue()
-    });
-  } else {
-    // For macOS builds, ImageId property should not be present
-    template.hasResourceProperties('AWS::CodeBuild::Fleet', {
-      BaseCapacity: codebuildStack.fleetProps?.baseCapacity || 1,
-      ComputeType: codebuildStack.fleetProps?.computeType || 'BUILD_GENERAL1_MEDIUM',
-      EnvironmentType: codebuildStack.environmentType
-    });
-  }
+  template.hasResourceProperties('AWS::CodeBuild::Fleet', {
+    BaseCapacity: 1,
+    ComputeType: 'BUILD_GENERAL1_MEDIUM',
+    EnvironmentType: codebuildStack.environmentType
+  });
 
   // Assert that the stack creates a Fleet service role
   template.hasResourceProperties('AWS::IAM::Role', {
