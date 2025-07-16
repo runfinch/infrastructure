@@ -147,6 +147,13 @@ export class CodeBuildStack extends cdk.Stack {
       })
     });
 
+    // Add Secrets Manager permissions to the CodeBuild project role for webhook operations
+    codebuildProject.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['secretsmanager:GetSecretValue'],
+        resources: [secretArn]
+      })
+    );
 
     return codebuildProject;
   }
