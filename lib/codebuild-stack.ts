@@ -113,6 +113,14 @@ export class CodeBuildStack extends cdk.Stack {
       ]
     });
 
+    // Add Secrets Manager permissions to the fleet service role
+    fleetServiceRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ['secretsmanager:GetSecretValue'],
+        resources: [secretArn]
+      })
+    );
+
     const fleet = new codebuild.Fleet(this, `Fleet-${toStackName(props.arch)}`, {
       ...(props.fleetProps || CodeBuildStackDefaultProps.fleetProps),
       environmentType: props.environmentType
@@ -139,6 +147,7 @@ export class CodeBuildStack extends cdk.Stack {
       })
     });
 
+    // Add Secrets Manager permissions to the CodeBuild project role for webhook operations
     codebuildProject.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ['secretsmanager:GetSecretValue'],
