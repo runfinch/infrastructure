@@ -38,7 +38,11 @@ export const CODEBUILD_STACKS: CodeBuildStackArgs[] = [
     arch: 'arm64',
     amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*22.04*',
     environmentType: codebuild.EnvironmentType.ARM_EC2,
-    buildImageOS: BuildImageOS.LINUX
+    buildImageOS: BuildImageOS.LINUX,
+    fleetProps: {
+      computeType: codebuild.FleetComputeType.LARGE,
+      baseCapacity: 1,
+    }
   },
   {
     project: 'finch-daemon',
