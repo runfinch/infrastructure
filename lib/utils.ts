@@ -51,7 +51,11 @@ export const CODEBUILD_STACKS: CodeBuildStackArgs[] = [
     amiSearchString: "", // Empty string since we're using buildImageString directly
     environmentType: codebuild.EnvironmentType.MAC_ARM,
     buildImageOS: BuildImageOS.MAC,
-    buildImageString: codebuild.MacBuildImage.BASE_14
+    buildImageString: codebuild.MacBuildImage.BASE_14,
+    fleetProps: {
+      computeType: codebuild.FleetComputeType.MEDIUM,
+      baseCapacity: 8 // 1 for finch-vm-test, 7 for SAMcli test
+    },
   }
 ];
 
