@@ -54,7 +54,7 @@ export const CODEBUILD_STACKS: CodeBuildStackArgs[] = [
     buildImageString: codebuild.MacBuildImage.BASE_14,
     fleetProps: {
       computeType: codebuild.FleetComputeType.MEDIUM,
-      baseCapacity: 5 // ideally 8, but capped at 5
+      baseCapacity: 4 // ideally 8, but capped
     },
   }
 ];
