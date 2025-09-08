@@ -14,7 +14,7 @@ import { ECRRepositoryStack } from './ecr-repo-stack';
 import { EventBridgeScanNotifsStack } from './event-bridge-scan-notifs-stack';
 import { PVREReportingStack } from './pvre-reporting-stack';
 import { SSMPatchingStack } from './ssm-patching-stack';
-import { CODEBUILD_STACKS, toStackName } from './utils';
+import { getCodeBuildStacks, toStackName } from './utils';
 
 export enum ENVIRONMENT_STAGE {
   Beta,
@@ -101,7 +101,7 @@ export class FinchPipelineAppStage extends cdk.Stage {
       }
     })(this, 'CodeBuildStack-credentials');
 
-    for (const { project, arch, operatingSystem, amiSearchString, environmentType, buildImageOS, buildImageString, fleetProps, projectEnvironmentProps } of CODEBUILD_STACKS) {
+    for (const { project, arch, operatingSystem, amiSearchString, environmentType, buildImageOS, buildImageString, fleetProps, projectEnvironmentProps } of getCodeBuildStacks(props.env?.account)) {
       let codeBuildStack;
       codeBuildStack = new CodeBuildStack(this, `CodeBuildStack-${operatingSystem}-${toStackName(arch)}`, {
         repo: project,

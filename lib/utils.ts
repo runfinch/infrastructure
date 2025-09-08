@@ -1,4 +1,15 @@
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
+import { EnvConfig } from '../config/env-config';
+
+// Increasing capacity only for release account, keeping intermediates at 1
+export const getMacBaseCapacityForAccount = (accountId?: string): number => {
+  switch (accountId) {
+    case EnvConfig.envRelease.account:
+      return 3;
+    default:
+      return 1;
+  }
+};
 
 export enum BuildImageOS {
   LINUX = 'linux',
@@ -23,7 +34,10 @@ export interface CodeBuildStackArgs {
   };
 }
 
-export const CODEBUILD_STACKS: CodeBuildStackArgs[] = [
+/**
+ * Get CodeBuild stacks configuration with account-specific capacity
+ */
+export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => [
   {
     project: 'finch',
     operatingSystem: 'ubuntu',
@@ -54,10 +68,13 @@ export const CODEBUILD_STACKS: CodeBuildStackArgs[] = [
     buildImageString: codebuild.MacBuildImage.BASE_14,
     fleetProps: {
       computeType: codebuild.FleetComputeType.MEDIUM,
-      baseCapacity: 5 // limit is 5 total runners
+      baseCapacity: getMacBaseCapacityForAccount(accountId)
     },
   }
 ];
+
+// Create const with default configuration for backwards compatibility
+export const CODEBUILD_STACKS: CodeBuildStackArgs[] = getCodeBuildStacks();
 
 // members of the runfinch org (+dependabot)
 // curl -s https://api.github.com/users/<username> | jq '.id'
