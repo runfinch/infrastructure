@@ -73,7 +73,7 @@ export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => 
   }
 ];
 
-// Create const with efault configuration for backwards compatibility
+// Create const with default configuration for backwards compatibility
 export const CODEBUILD_STACKS: CodeBuildStackArgs[] = getCodeBuildStacks();
 
 // members of the runfinch org (+dependabot)
