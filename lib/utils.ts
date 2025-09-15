@@ -1,6 +1,7 @@
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import { EnvConfig } from '../config/env-config';
 
+// Increasing capacity for chosen accounts
 export const getMacBaseCapacityForAccount = (accountId?: string): number => {
   switch (accountId) {
     case EnvConfig.envRelease.account:
