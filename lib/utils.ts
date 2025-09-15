@@ -1,10 +1,11 @@
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import { EnvConfig } from '../config/env-config';
 
-// Increasing capacity only for release account, keeping intermediates at 1
 export const getMacBaseCapacityForAccount = (accountId?: string): number => {
   switch (accountId) {
     case EnvConfig.envRelease.account:
+      return 3;
+    case EnvConfig.envProd.account:
       return 3;
     default:
       return 1;
