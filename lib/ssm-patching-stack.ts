@@ -13,8 +13,8 @@ export class SSMPatchingStack extends cdk.Stack {
       allowUnassociatedTargets: false,
       cutoff: 0,
       duration: 2,
-      // Every day at 8 AM UTC
-      schedule: 'cron(0 8 ? * * *)'
+      // Every day at 6 AM UTC
+      schedule: 'cron(0 6 ? * * *)'
     });
 
     const maintenanceTarget = new CfnMaintenanceWindowTarget(this, 'MaintenanceWindowTarget', {
