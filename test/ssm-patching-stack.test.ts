@@ -15,7 +15,7 @@ describe('SSMPatchingStack', () => {
         Cutoff: 0,
         Duration: 2,
         Name: 'Patching-Window',
-        Schedule: 'cron(0 8 ? * * *)'
+        Schedule: 'cron(0 6 ? * * *)'
       }
     });
 
