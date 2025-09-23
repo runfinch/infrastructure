@@ -375,7 +375,7 @@
       },
       {
         "platform": "mac",
-        "version": "15.7",
+        "version": "15.6",
         "arch": "arm",
         "repo": "finch-core",
         "desiredInstances": 1,
@@ -387,7 +387,7 @@
       },
       {
         "platform": "mac",
-        "version": "15.7",
+        "version": "15.6",
         "arch": "x86",
         "repo": "finch-core",
         "desiredInstances": 1,
