@@ -67,7 +67,7 @@ export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => 
     amiSearchString: "", // Empty string since we're using buildImageString directly
     environmentType: codebuild.EnvironmentType.MAC_ARM,
     buildImageOS: BuildImageOS.MAC,
-    buildImageString: codebuild.MacBuildImage.BASE_14,
+    buildImageString: codebuild.MacBuildImage.BASE_15,
     fleetProps: {
       computeType: codebuild.FleetComputeType.MEDIUM,
       baseCapacity: getMacBaseCapacityForAccount(accountId)
