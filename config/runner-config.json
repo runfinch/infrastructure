@@ -374,6 +374,30 @@
         ]
       },
       {
+        "platform": "mac",
+        "version": "14.7",
+        "arch": "arm",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": [
+          "us-east-2a",
+          "us-east-2b",
+          "us-east-2c"
+        ]
+      },
+      {
+        "platform": "mac",
+        "version": "14.7",
+        "arch": "x86",
+        "repo": "finch-core",
+        "desiredInstances": 1,
+        "availabilityZones": [
+          "us-east-2a",
+          "us-east-2b",
+          "us-east-2c"
+        ]
+      },
+      {
         "platform": "windows",
         "version": "2022",
         "arch": "x86",
