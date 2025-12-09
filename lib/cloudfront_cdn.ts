@@ -4,6 +4,7 @@ import * as cloudfront_origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import { CfnOutput, Stack } from 'aws-cdk-lib';
+import { CloudfrontMonitoringStack } from './cloudfront-monitoring-stack';
 
 interface CloudfrontCdnProps {
   bucket: s3.Bucket;
@@ -41,6 +42,10 @@ export class CloudfrontCdn extends Construct {
     });
     this.urlOutput = new CfnOutput(this, 'Distribution Domain', {
       value: distribution.domainName
+    });
+
+    new CloudfrontMonitoringStack(this, `${id}-Monitoring`, {
+      distributionId: distribution.distributionId
     });
   }
 }
