@@ -20,8 +20,11 @@ export class CloudfrontCdn extends Construct {
 
     props.bucket.addToResourcePolicy(
       new iam.PolicyStatement({
-        actions: ['s3:GetObject'],
-        resources: [props.bucket.arnForObjects('*')],
+        actions: ['s3:GetObject', 's3:ListBucket'],
+        resources: [
+          props.bucket.bucketArn,           // arn:aws:s3:::bucket-name
+          props.bucket.arnForObjects('*')   // arn:aws:s3:::bucket-name/*
+        ],
         principals: [new iam.CanonicalUserPrincipal(cloudfrontOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
       })
     );

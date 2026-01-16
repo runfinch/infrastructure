@@ -24,7 +24,8 @@ export class ArtifactBucketCloudfrontStack extends cdk.Stack {
     // upload the file for integration testing puporse
     new s3Deployment.BucketDeployment(this, 'DeployTestFile', {
       sources: [s3Deployment.Source.asset('./assets')],
-      destinationBucket: artifactBucket
+      destinationBucket: artifactBucket,
+      prune: false
     });
 
     const cloudfrontCdn = new CloudfrontCdn(this, 'ArtifactCloudfrontCdn', {

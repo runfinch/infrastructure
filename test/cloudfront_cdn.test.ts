@@ -46,28 +46,33 @@ describe('CloudfrontCdn', () => {
         Ref: bukcetLogicalId
       },
       PolicyDocument: {
-        Statement: [
+        Statement: Match.arrayWith([
           Match.objectLike({
-            Action: 's3:GetObject',
+            Action: ['s3:GetObject', 's3:ListBucket'],
             Effect: 'Allow',
             Principal: {
               CanonicalUser: {
                 'Fn::GetAtt': [Match.anyValue(), 'S3CanonicalUserId']
               }
             },
-            Resource: {
-              'Fn::Join': [
-                '',
-                [
-                  {
-                    'Fn::GetAtt': [bukcetLogicalId, 'Arn']
-                  },
-                  '/*'
+            Resource: [
+              {
+                'Fn::GetAtt': [bukcetLogicalId, 'Arn']
+              },
+              {
+                'Fn::Join': [
+                  '',
+                  [
+                    {
+                      'Fn::GetAtt': [bukcetLogicalId, 'Arn']
+                    },
+                    '/*'
+                  ]
                 ]
-              ]
-            }
+              }
+            ]
           })
-        ],
+        ]),
         Version: '2012-10-17'
       }
     });
