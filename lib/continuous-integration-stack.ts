@@ -28,7 +28,7 @@ export class ContinuousIntegrationStack extends cdk.Stack {
       assumedBy: new iam.WebIdentityPrincipal(ghProvider.openIdConnectProviderArn),
       roleName: 'GithubActionsRole',
       description: 'This role is used by GitHub Actions',
-      maxSessionDuration: cdk.Duration.hours(1)
+      maxSessionDuration: cdk.Duration.hours(2)
     });
     githubActionsRole.addToPolicy(
       new iam.PolicyStatement({
