@@ -83,17 +83,16 @@ export const CODEBUILD_STACKS: CodeBuildStackArgs[] = getCodeBuildStacks();
 // TODO: automate fetching account ID's
 export const GITHUB_ALLOWLISTED_ACCOUNT_IDS = [
   '47769978', // coderbirju
-  '424987', // pendo324
-  '2304727', // Kern--
   '2967759', // henry118
   '47723536', // Shubhranshu153
   '55555210', // sondavidb
-  '5525370', // swagatbora90
   '59450965', // cezar-r
   '135386930', // cartrius
-  '40778211', // channing
-  '23559763', // swapnanil gupta
-  '219054581', // ayush panta 
+  '23559763', // Swapnanil-Gupta
+  '219054581', // ayush-panta
+  '71107651', // smandhada16
+  '10296556', // KlwntSingh
+  '135713015', // shashank-boyapally
   '49699333' // dependabot[bot] github app
 ];
 
