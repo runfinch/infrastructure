@@ -55,8 +55,8 @@ describe('CodeBuildStack', () => {
 const validateTemplate = (codebuildStack: CodeBuildStackArgs, template: Template) => {
   let imageMatcher;
   if (codebuildStack.amiSearchString === "") {
-    // For macOS builds, match only the base image versions (14 or 15)
-    imageMatcher = Match.stringLikeRegexp('aws/codebuild/macos-arm-base:1[45]$');
+    // For macOS builds, match only the base image versions (14, 15, or 26)
+    imageMatcher = Match.stringLikeRegexp('aws/codebuild/macos-arm-base:(1[45]|26)$');
   } else {
     // For regular builds, expect an AMI ID
     imageMatcher = Match.stringLikeRegexp('ami-1234');
