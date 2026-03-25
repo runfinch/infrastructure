@@ -21,7 +21,11 @@ export class FinchPipelineStack extends cdk.Stack {
       crossAccountKeys: true,
       synth: new ShellStep('Synth', {
         input: source,
-        commands: ['npm ci', 'npm run build', 'npx cdk synth']
+        commands: [
+          'npm ci',
+          'npm run build',
+          'npx cdk synth'
+        ]
       }),
       synthCodeBuildDefaults: {
         partialBuildSpec: BuildSpec.fromObject({
