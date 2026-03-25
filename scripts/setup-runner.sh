@@ -27,16 +27,16 @@ PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 if [ $(arch) == "arm64" ]
 then
   LABEL_ARCH="arm64"
-  curl -o actions-runner-osx-arm64-2.303.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.303.0/actions-runner-osx-arm64-2.303.0.tar.gz
-  echo "bbbac8011066b6cec93deb2365132b082b92287baaf34b5d9539e955ffe450ff  actions-runner-osx-arm64-2.303.0.tar.gz" | shasum -a 256 -c
+  curl -o actions-runner-osx-arm64-2.333.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.333.0/actions-runner-osx-arm64-2.333.0.tar.gz
+  echo "d92ea082bede9616120800b0e4a09f1aa209c922ade05d59bc3ee7c4de56f73c  actions-runner-osx-arm64-2.333.0.tar.gz" | shasum -a 256 -c
   # Extract the installer
-  tar xzf ./actions-runner-osx-arm64-2.303.0.tar.gz
+  tar xzf ./actions-runner-osx-arm64-2.333.0.tar.gz
 else
   LABEL_ARCH="amd64"
-  curl -o actions-runner-osx-x64-2.303.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.303.0/actions-runner-osx-x64-2.303.0.tar.gz
-  echo "8bd595568ceee5eb25576972bc8075b47c149b3fac7eb7873deed67944b45739  actions-runner-osx-x64-2.303.0.tar.gz" | shasum -a 256 -c
+  curl -o actions-runner-osx-x64-2.333.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.333.0/actions-runner-osx-x64-2.333.0.tar.gz
+  echo "2b0ba7df7be9b9c36b4b86c19539b3a8be027ce926610b71606a6e445197094b  actions-runner-osx-x64-2.333.0.tar.gz" | shasum -a 256 -c
   # Extract the installer
-  tar xzf ./actions-runner-osx-x64-2.303.0.tar.gz
+  tar xzf ./actions-runner-osx-x64-2.333.0.tar.gz
 fi
 
 # Get GH API key and fetch a runner registration token

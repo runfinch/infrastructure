@@ -44,7 +44,7 @@ export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => 
     project: 'finch',
     operatingSystem: 'ubuntu',
     arch: 'x86_64',
-    amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*22.04*',
+    amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*24.04*',
     environmentType: codebuild.EnvironmentType.LINUX_EC2,
     buildImageOS: BuildImageOS.LINUX
   },
@@ -52,7 +52,7 @@ export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => 
     project: 'finch',
     operatingSystem: 'ubuntu',
     arch: 'arm64',
-    amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*22.04*',
+    amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*24.04*',
     environmentType: codebuild.EnvironmentType.ARM_EC2,
     buildImageOS: BuildImageOS.LINUX,
     fleetProps: {
@@ -68,6 +68,19 @@ export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => 
     environmentType: codebuild.EnvironmentType.MAC_ARM,
     buildImageOS: BuildImageOS.MAC,
     buildImageString: codebuild.MacBuildImage.BASE_15,
+    fleetProps: {
+      computeType: codebuild.FleetComputeType.MEDIUM,
+      baseCapacity: getMacBaseCapacityForAccount(accountId)
+    },
+  },
+  {
+    project: 'finch-daemon',
+    operatingSystem: 'macOS26',
+    arch: 'arm64',
+    amiSearchString: "",
+    environmentType: codebuild.EnvironmentType.MAC_ARM,
+    buildImageOS: BuildImageOS.MAC,
+    buildImageString: codebuild.MacBuildImage.BASE_26,
     fleetProps: {
       computeType: codebuild.FleetComputeType.MEDIUM,
       baseCapacity: getMacBaseCapacityForAccount(accountId)

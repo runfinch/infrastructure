@@ -20,11 +20,13 @@ UNAME_MACHINE="$(/usr/bin/uname -m)"
 if [ "${UNAME_MACHINE}" = "aarch64" ]; then
     GH_RUNNER_ARCH="arm64"
     NODE_DOWNLOAD_ARCH="arm64"
-    GH_RUNNER_DOWNLOAD_HASH="a96b0cec7b0237ca5e4210982368c6f7d8c2ab1e5f6b2604c1ccede9cedcb143"
+    GH_RUNNER_DOWNLOAD_HASH="b5697062a13f63b44f869de9369638a7039677b9e0f87e47a6001a758c0d09bf"
+    NODE_DOWNLOAD_HASH="e7adfca03d9173276114a6f2219df1a7d25e1bfd6bbd771d3f839118a2053094"
 else
     GH_RUNNER_ARCH="x64"
-    NODE_DOWNLOAD_ARCH="x86_64"
-    GH_RUNNER_DOWNLOAD_HASH="b13b784808359f31bc79b08a191f5f83757852957dd8fe3dbfcc38202ccf5768"
+    NODE_DOWNLOAD_ARCH="x64"
+    GH_RUNNER_DOWNLOAD_HASH="7ce6b3fd8f879797fcc252c2918a23e14a233413dc6e6ab8e0ba8768b5d54475"
+    NODE_DOWNLOAD_HASH="41cd79bb7877c81605a9e68ec4c91547774f46a40c67a17e34d7179ef11729df"
 fi
 
 if [ "${OS_NAME}" = "Amazon Linux" ]; then
@@ -34,10 +36,12 @@ if [ "${OS_NAME}" = "Amazon Linux" ]; then
     if [ "${OS_VERSION}" = "2" ]; then
         GH_RUNNER_DEPENDENCIES="openssl krb5-libs zlib jq"
         ADDITIONAL_PACKAGES="policycoreutils-python systemd-rpm-macros inotify-tools ${GH_RUNNER_DEPENDENCIES}"
-        NODE_VERSION="21.2.0"
-        curl -OL "https://d3rnber7ry90et.cloudfront.net/linux-${NODE_DOWNLOAD_ARCH}/node-v${NODE_VERSION}.tar.gz"
-        tar -xf node-v${NODE_VERSION}.tar.gz
-        mv node-v${NODE_VERSION}/bin/* /usr/bin
+        NODE_VERSION="24.14.0"
+        NODE_FILENAME="node-v${NODE_VERSION}-linux-${NODE_DOWNLOAD_ARCH}.tar.xz"
+        curl -LO "https://nodejs.org/dist/v${NODE_VERSION}/${NODE_FILENAME}"
+        echo "${NODE_DOWNLOAD_HASH}  ${NODE_FILENAME}" | sha256sum -c
+        tar -xf "${NODE_FILENAME}"
+        mv "node-v${NODE_VERSION}-linux-${NODE_DOWNLOAD_ARCH}/bin/*" /usr/bin
         # enable EPEL repos, required to install inotify-tools package
         amazon-linux-extras install epel -y
     elif [ "${OS_VERSION}" = "2023" ]; then
@@ -62,7 +66,7 @@ done
 # start containerd
 systemctl enable --now containerd
 
-GH_RUNNER_VERSION="2.322.0"
+GH_RUNNER_VERSION="2.333.0"
 GH_RUNNER_FILENAME="actions-runner-linux-${GH_RUNNER_ARCH}-${GH_RUNNER_VERSION}.tar.gz"
 GH_RUNNER_DOWNLOAD_URL="https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/${GH_RUNNER_FILENAME}"
 
