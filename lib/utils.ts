@@ -62,7 +62,7 @@ export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => 
   },
   {
     project: 'finch-daemon',
-    operatingSystem: 'macOS',
+    operatingSystem: 'macOS15',
     arch: 'arm64',
     amiSearchString: "", // Empty string since we're using buildImageString directly
     environmentType: codebuild.EnvironmentType.MAC_ARM,
