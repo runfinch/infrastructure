@@ -103,7 +103,7 @@ export class CodeBuildStack extends cdk.Stack {
     const secretArn = this.formatArn({
       service: 'secretsmanager',
       resource: 'secret',
-      resourceName: `codebuild-github-access-token-??????`,
+      resourceName: `codebuild-github-access-token-*`,
       arnFormat: cdk.ArnFormat.COLON_RESOURCE_NAME
     });
 
@@ -162,9 +162,24 @@ export class CodeBuildStack extends cdk.Stack {
     
     cfnFleet.addPropertyOverride('FleetServiceRole', fleetServiceRole.roleArn);
 
+    const codebuildProjectGHSecretAccessRole = new iam.Role(this, `ProjectGHSecretAccessRole-${platformId}`, {
+      assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
+      inlinePolicies: {
+        SecretsAccess: new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              actions: ['secretsmanager:GetSecretValue'],
+              resources: [secretArn]
+            })
+          ]
+        })
+      }
+    });
+
     const codebuildProject = new codebuild.Project(this, id, {
       projectName: props.projectName,
       source: githubSource,
+      role: codebuildProjectGHSecretAccessRole,
       environment: {
         ...(props.projectEnvironmentProps || CodeBuildStackDefaultProps.projectEnvironmentProps),
         fleet: fleet,
@@ -176,14 +191,6 @@ export class CodeBuildStack extends cdk.Stack {
         enabled: true
       })
     });
-
-    // Add Secrets Manager permissions to the CodeBuild project role for webhook operations
-    codebuildProject.addToRolePolicy(
-      new iam.PolicyStatement({
-        actions: ['secretsmanager:GetSecretValue'],
-        resources: [secretArn]
-      })
-    );
 
     return codebuildProject;
   }

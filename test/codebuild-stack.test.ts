@@ -122,6 +122,33 @@ const validateTemplate = (codebuildStack: CodeBuildStackArgs, template: Template
     )
   });
 
+  // Assert that the project role has an inline policy granting Secrets Manager access
+  template.hasResourceProperties('AWS::IAM::Role', {
+    AssumeRolePolicyDocument: Match.objectLike({
+      Statement: Match.arrayWith([
+        Match.objectLike({
+          Principal: { Service: 'codebuild.amazonaws.com' }
+        })
+      ])
+    }),
+    Policies: Match.arrayWith([
+      Match.objectLike({
+        PolicyName: 'SecretsAccess',
+        PolicyDocument: {
+          Statement: Match.arrayWith([
+            Match.objectLike({
+              Action: 'secretsmanager:GetSecretValue',
+              Effect: 'Allow',
+              Resource: {
+                'Fn::Join': ['', Match.arrayWith([':secretsmanager:', ':secret:codebuild-github-access-token-*'])]
+              }
+            })
+          ])
+        }
+      })
+    ])
+  });
+
   // Check resource count
   template.resourceCountIs('AWS::CodeBuild::Project', 1);
   template.resourceCountIs('AWS::CodeBuild::Fleet', 1);
