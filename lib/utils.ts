@@ -44,7 +44,7 @@ export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => 
     project: 'finch',
     operatingSystem: 'ubuntu',
     arch: 'x86_64',
-    amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*24.04*',
+    amiSearchString: 'ubuntu/images/hvm-ssd-gp3/ubuntu*24.04*',
     environmentType: codebuild.EnvironmentType.LINUX_EC2,
     buildImageOS: BuildImageOS.LINUX
   },
@@ -52,7 +52,7 @@ export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => 
     project: 'finch',
     operatingSystem: 'ubuntu',
     arch: 'arm64',
-    amiSearchString: 'ubuntu/images/hvm-ssd/ubuntu*24.04*',
+    amiSearchString: 'ubuntu/images/hvm-ssd-gp3/ubuntu*24.04*', // TODO: make this more robust
     environmentType: codebuild.EnvironmentType.ARM_EC2,
     buildImageOS: BuildImageOS.LINUX,
     fleetProps: {
