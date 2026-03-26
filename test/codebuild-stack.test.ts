@@ -140,7 +140,7 @@ const validateTemplate = (codebuildStack: CodeBuildStackArgs, template: Template
               Action: 'secretsmanager:GetSecretValue',
               Effect: 'Allow',
               Resource: {
-                'Fn::Join': ['', Match.arrayWith([':secretsmanager:', ':secret:codebuild-github-access-token-*'])]
+                'Fn::Join': ['', Match.arrayWith([Match.stringLikeRegexp(':secretsmanager:.*:secret:codebuild-github-access-token-\\*')])]
               }
             })
           ])
