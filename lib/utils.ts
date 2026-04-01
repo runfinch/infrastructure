@@ -5,9 +5,9 @@ import { EnvConfig } from '../config/env-config';
 export const getMacBaseCapacityForAccount = (accountId?: string): number => {
   switch (accountId) {
     case EnvConfig.envRelease.account:
-      return 3;
+      return 1;
     case EnvConfig.envProd.account:
-      return 3;
+      return 1;
     default:
       return 1;
   }
@@ -59,19 +59,6 @@ export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => 
       computeType: codebuild.FleetComputeType.LARGE,
       baseCapacity: 1,
     }
-  },
-  {
-    project: 'finch-daemon',
-    operatingSystem: 'macOS15',
-    arch: 'arm64',
-    amiSearchString: "", // Empty string since we're using buildImageString directly
-    environmentType: codebuild.EnvironmentType.MAC_ARM,
-    buildImageOS: BuildImageOS.MAC,
-    buildImageString: codebuild.MacBuildImage.BASE_15,
-    fleetProps: {
-      computeType: codebuild.FleetComputeType.MEDIUM,
-      baseCapacity: getMacBaseCapacityForAccount(accountId)
-    },
   },
   {
     project: 'finch-daemon',
