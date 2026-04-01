@@ -12,6 +12,7 @@ import { CodeBuildStack } from './codebuild-stack';
 import { ContinuousIntegrationStack } from './continuous-integration-stack';
 import { ECRRepositoryStack } from './ecr-repo-stack';
 import { EventBridgeScanNotifsStack } from './event-bridge-scan-notifs-stack';
+import { InspectorWatcherStack } from './inspector-watcher-stack';
 import { PVREReportingStack } from './pvre-reporting-stack';
 import { SSMPatchingStack } from './ssm-patching-stack';
 import { getCodeBuildStacks, toStackName } from './utils';
@@ -74,6 +75,8 @@ export class FinchPipelineAppStage extends cdk.Stage {
       // Only report rootfs image scans in prod to avoid duplicate notifications.
       if (props.environmentStage == ENVIRONMENT_STAGE.Prod) {
         new EventBridgeScanNotifsStack(this, 'EventBridgeScanNotifsStack', this.stageName);
+        // Stack to enable InspectorWatcher to scan os images in our ECR repo.
+        new InspectorWatcherStack(this, 'InspectorWatcherStack', { terminationProtection: true });
       }
 
       new ContinuousIntegrationStack(this, 'FinchContinuousIntegrationStack', this.stageName, {
