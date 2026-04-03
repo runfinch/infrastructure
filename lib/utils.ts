@@ -1,17 +1,11 @@
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import { EnvConfig } from '../config/env-config';
 
-// Increasing capacity for chosen accounts
 export const getMacBaseCapacityForAccount = (accountId?: string): number => {
-  switch (accountId) {
-    case EnvConfig.envRelease.account:
-      return 1;
-    case EnvConfig.envProd.account:
-      return 1;
-    default:
-      return 1;
-  }
-};
+  // Account specific configuration has been removed for now,
+  // as we are facing capacity issues with the dedicated mac instances.
+  return 1;
+}
 
 export enum BuildImageOS {
   LINUX = 'linux',
@@ -39,41 +33,62 @@ export interface CodeBuildStackArgs {
 /**
  * Get CodeBuild stacks configuration with account-specific capacity
  */
-export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => [
-  {
-    project: 'finch',
-    operatingSystem: 'ubuntu',
-    arch: 'x86_64',
-    amiSearchString: 'ubuntu/images/hvm-ssd-gp3/ubuntu*24.04*',
-    environmentType: codebuild.EnvironmentType.LINUX_EC2,
-    buildImageOS: BuildImageOS.LINUX
-  },
-  {
-    project: 'finch',
-    operatingSystem: 'ubuntu',
-    arch: 'arm64',
-    amiSearchString: 'ubuntu/images/hvm-ssd-gp3/ubuntu*24.04*', // TODO: make this more robust
-    environmentType: codebuild.EnvironmentType.ARM_EC2,
-    buildImageOS: BuildImageOS.LINUX,
-    fleetProps: {
-      computeType: codebuild.FleetComputeType.LARGE,
-      baseCapacity: 1,
-    }
-  },
-  {
-    project: 'finch-daemon',
-    operatingSystem: 'macOS26',
-    arch: 'arm64',
-    amiSearchString: "",
-    environmentType: codebuild.EnvironmentType.MAC_ARM,
-    buildImageOS: BuildImageOS.MAC,
-    buildImageString: codebuild.MacBuildImage.BASE_26,
-    fleetProps: {
-      computeType: codebuild.FleetComputeType.MEDIUM,
-      baseCapacity: getMacBaseCapacityForAccount(accountId)
+export const getCodeBuildStacks = (accountId?: string): CodeBuildStackArgs[] => {
+  const stacks: CodeBuildStackArgs[] = [
+    {
+      project: 'finch',
+      operatingSystem: 'ubuntu',
+      arch: 'x86_64',
+      amiSearchString: 'ubuntu/images/hvm-ssd-gp3/ubuntu*24.04*',
+      environmentType: codebuild.EnvironmentType.LINUX_EC2,
+      buildImageOS: BuildImageOS.LINUX
     },
+    {
+      project: 'finch',
+      operatingSystem: 'ubuntu',
+      arch: 'arm64',
+      amiSearchString: 'ubuntu/images/hvm-ssd-gp3/ubuntu*24.04*', // TODO: make this more robust
+      environmentType: codebuild.EnvironmentType.ARM_EC2,
+      buildImageOS: BuildImageOS.LINUX,
+      fleetProps: {
+        computeType: codebuild.FleetComputeType.LARGE,
+        baseCapacity: 1,
+      }
+    },
+    {
+      project: 'finch-daemon',
+      operatingSystem: 'macOS26',
+      arch: 'arm64',
+      amiSearchString: "",
+      environmentType: codebuild.EnvironmentType.MAC_ARM,
+      buildImageOS: BuildImageOS.MAC,
+      buildImageString: codebuild.MacBuildImage.BASE_26,
+      fleetProps: {
+        computeType: codebuild.FleetComputeType.MEDIUM,
+        baseCapacity: getMacBaseCapacityForAccount(accountId)
+      },
+    }
+  ];
+
+  // Only deploy SAM CLI integration test stack in prod
+  if (accountId === EnvConfig.envProd.account) {
+    stacks.push({
+      project: 'finch',
+      operatingSystem: 'macOS26-samcli',
+      arch: 'arm64',
+      amiSearchString: "",
+      environmentType: codebuild.EnvironmentType.MAC_ARM,
+      buildImageOS: BuildImageOS.MAC as BuildImageOS.MAC,
+      buildImageString: codebuild.MacBuildImage.BASE_26,
+      fleetProps: {
+        computeType: codebuild.FleetComputeType.MEDIUM,
+        baseCapacity: getMacBaseCapacityForAccount(accountId)
+      },
+    })
   }
-];
+
+  return stacks;
+}
 
 // Create const with default configuration for backwards compatibility
 export const CODEBUILD_STACKS: CodeBuildStackArgs[] = getCodeBuildStacks();

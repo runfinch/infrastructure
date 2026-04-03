@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as inspectorv2 from 'aws-cdk-lib/aws-inspectorv2';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
@@ -26,7 +27,7 @@ export class EventBridgeScanNotifsStack extends cdk.Stack {
       runtime: lambda.Runtime.PYTHON_3_11,
       handler: 'main.lambda_handler',
       code: lambda.Code.fromAsset(path.join(__dirname, 'image-scanning-notifications-lambda-handler')),
-      environment: {'SNS_ARN': topic.topicArn,},
+      environment: { 'SNS_ARN': topic.topicArn, },
     });
 
     const snsTopicPolicy = new iam.PolicyStatement({
@@ -35,20 +36,43 @@ export class EventBridgeScanNotifsStack extends cdk.Stack {
     });
 
     notificationFn.addToRolePolicy(snsTopicPolicy);
-    
+
+    const latestAmd64Tag = 'latest-x86-64';
+    const latestArm64Tag = 'latest-arm64';
+
     // Only publish CRITICAL and HIGH findings (more than 7.0 CVE score) that are ACTIVE
+    // and are from images tagged with either 'latest-amd64' or 'latest-arm64'.
     // https://docs.aws.amazon.com/inspector/latest/user/findings-understanding-severity.html
     const rule = new events.Rule(this, 'rule', {
-        eventPattern: {
-          source: ['aws.inspector2'],
-          detail: {
-            severity: ['HIGH', 'CRITICAL'], 
-            status: events.Match.exactString('ACTIVE')
+      eventPattern: {
+        source: ['aws.inspector2'],
+        detail: {
+          severity: ['HIGH', 'CRITICAL'],
+          status: events.Match.exactString('ACTIVE'),
+          resources: {
+            details: {
+              awsEcrContainerImage: {
+                imageTags: [latestAmd64Tag, latestArm64Tag],
+              },
+            },
           },
-          detailType: events.Match.exactString('Inspector2 Finding'),
         },
-      });
+        detailType: events.Match.exactString('Inspector2 Finding'),
+      },
+    });
 
     rule.addTarget(new targets.LambdaFunction(notificationFn))
+
+    // Suppress inspector findings from images that don't have the latest tags
+    new inspectorv2.CfnFilter(this, 'SuppressNonLatestImageFindings', {
+      filterAction: 'SUPPRESS',
+      name: 'SuppressNonLatestImageFindings',
+      filterCriteria: {
+        ecrImageTags: [
+          { comparison: 'NOT_EQUALS', value: latestAmd64Tag },
+          { comparison: 'NOT_EQUALS', value: latestArm64Tag },
+        ],
+      },
+    });
   }
 }
