@@ -11,8 +11,8 @@ export class InspectorWatcherStack extends cdk.Stack {
 
     const accountId = ssm.StringParameter.valueForStringParameter(this, '/finch/account/inspector-watcher');
 
-    new iam.Role(this, 'InspectorWatcherReadonly', {
-      roleName: 'InspectorWatcherReadonly',
+    new iam.Role(this, 'InspectorWatcherReadOnly', {
+      roleName: 'InspectorWatcherReadOnly',
       assumedBy: new iam.ArnPrincipal(`arn:aws:iam::${accountId}:root`).withConditions({
         ArnLike: {
           'aws:PrincipalArn': `arn:aws:iam::${accountId}:role/InspectorWatcherStack*`,
