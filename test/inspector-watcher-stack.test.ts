@@ -15,7 +15,7 @@ describe('InspectorWatcherStack', () => {
     template.resourceCountIs('AWS::IAM::Role', 1);
     template.hasResource('AWS::IAM::Role', {
       Properties: {
-        RoleName: 'InspectorWatcherReadonly',
+        RoleName: 'InspectorWatcherReadOnly',
         AssumeRolePolicyDocument: {
           Statement: [
             Match.objectLike({
