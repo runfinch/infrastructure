@@ -22,7 +22,7 @@ export class TicketingWebhookSecretAccessStack extends cdk.Stack {
             new iam.PolicyStatement({
               sid: 'TicketingWebhookSecretAccess',
               actions: ['secretsmanager:GetSecretValue'],
-              resources: [`arn:aws:secretsmanager:*:${cdk.Aws.ACCOUNT_ID}:secret:ticketing-github-webhook-secret*`],
+              resources: [`arn:aws:secretsmanager:us-west-2:${cdk.Aws.ACCOUNT_ID}:secret:ticketing-github-webhook-secret*`],
             }),
           ],
         }),

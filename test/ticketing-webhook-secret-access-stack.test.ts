@@ -49,7 +49,7 @@ describe('TicketingWebhookSecretAccessStack', () => {
                     'Fn::Join': [
                       '',
                       [
-                        'arn:aws:secretsmanager:*:',
+                        'arn:aws:secretsmanager:us-west-2:',
                         { Ref: 'AWS::AccountId' },
                         ':secret:ticketing-github-webhook-secret*',
                       ],
