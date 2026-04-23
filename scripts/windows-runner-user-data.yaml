@@ -126,9 +126,34 @@ tasks:
           Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl_update_x64.msi /L*V C:\WSLInstallation.log /quiet'
           Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
           Add-MpPreference -ExclusionPath "C:\Users\ADMINI~1\AppData\Local\Temp\go-build*" -Force
-          Start-Job -ScriptBlock { Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu' }
-          sleep 30 # sleep to allow Ubuntu VM to start
-          New-NetFirewallRule -DisplayName "WSL" -Direction Inbound -InterfaceAlias "vEthernet (WSL)" -Action Allow
+          $job = Start-Job -ScriptBlock { Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu' -PassThru }
+          Write-Information "Waiting for vEthernet (WSL) interface to be created..."
+          $waitStart = Get-Date
+          $maxWait = 120
+          while (!(Get-NetAdapter -Name "vEthernet (WSL)" -ErrorAction SilentlyContinue)) {
+              if ($job.State -eq 'Failed') {
+                  Write-Error "WSL job failed: $(Receive-Job -Job $job 2>&1)"
+                  break
+              }
+              if (((Get-Date) - $waitStart).TotalSeconds -gt $maxWait) {
+                  Write-Error "Timeout waiting for vEthernet (WSL) interface after $maxWait seconds"
+                  break
+              }
+              Start-Sleep -Seconds 5
+          }
+          $waitTime = (Get-Date) - $waitStart
+          Write-Information "vEthernet (WSL) interface detected after $($waitTime.TotalSeconds) seconds, creating firewall rule..."
+          if (Get-NetAdapter -Name "vEthernet (WSL)" -ErrorAction SilentlyContinue) {
+              New-NetFirewallRule -DisplayName "WSL" -Direction Inbound -InterfaceAlias "vEthernet (WSL)" -Action Allow -ErrorAction Stop
+              $rule = Get-NetFirewallRule -DisplayName "WSL" -ErrorAction SilentlyContinue
+              if ($rule) {
+                  Write-Information "Firewall rule created successfully. Rule ID: $($rule.Name)"
+              } else {
+                  Write-Error "Firewall rule creation command succeeded but rule not found in firewall."
+              }
+          } else {
+              Write-Error "vEthernet (WSL) interface not found, skipping firewall rule creation."
+          }
           '@
 
           # Write startup powershell script to file. 
