@@ -59,6 +59,16 @@ export class ContinuousIntegrationStack extends cdk.Stack {
     const repo = props.rootfsEcrRepository;
     repo.grantPullPush(githubActionsRole);
     ecr.AuthorizationToken.grantRead(githubActionsRole)
+    
+    // Permission to delete images from ECR is required by this workflow 
+    // https://github.com/runfinch/finch-core/blob/main/.github/workflows/push-container-image.yaml
+    // to clean up unused os images and reduce aws-inspector generated noise.
+    githubActionsRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ['ecr:BatchDeleteImage'],
+        resources: [repo.repositoryArn]
+      })
+    );
 
     new CloudfrontCdn(this, 'DependenciesCloudfrontCdn', {
       bucket
