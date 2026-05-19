@@ -15,7 +15,7 @@ describe('TicketingWebhookSecretAccessStack', () => {
     template.resourceCountIs('AWS::IAM::Role', 1);
     template.hasResource('AWS::IAM::Role', {
       Properties: {
-        RoleName: 'TicketingWebhookSecretAccessRole',
+        RoleName: ssmParamRef,
         AssumeRolePolicyDocument: {
           Statement: [
             Match.objectLike({
@@ -38,11 +38,11 @@ describe('TicketingWebhookSecretAccessStack', () => {
         },
         Policies: [
           Match.objectLike({
-            PolicyName: 'TicketingWebhookSecretAccess',
+            PolicyName: 'SecretsManagerAccess',
             PolicyDocument: {
               Statement: [
                 Match.objectLike({
-                  Sid: 'TicketingWebhookSecretAccess',
+                  Sid: 'SecretsManagerAccess',
                   Effect: 'Allow',
                   Action: 'secretsmanager:GetSecretValue',
                   Resource: {
