@@ -2,10 +2,15 @@ import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import { EnvConfig } from '../config/env-config';
 
 export const getMacBaseCapacityForAccount = (accountId?: string): number => {
-  // Account specific configuration has been removed for now,
-  // as we are facing capacity issues with the dedicated mac instances.
-  return 1;
-}
+  switch (accountId) {
+    case EnvConfig.envRelease.account:
+      return 3;
+    case EnvConfig.envProd.account:
+      return 3;
+    default:
+      return 1;
+  }
+};
 
 export enum BuildImageOS {
   LINUX = 'linux',
