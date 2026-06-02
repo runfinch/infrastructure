@@ -266,6 +266,29 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
         desiredCapacity: 0
       });
     }
+
+    // Nightly recycle for macOS 26 finch runners to prevent
+    // state accumulation that causes runners to become unresponsive.
+    const isMac26Finch =
+      this.platform === PlatformType.MAC &&
+      this.version.startsWith('26') &&
+      this.repo === 'finch';
+
+    if (isMac26Finch) {
+      new autoscaling.CfnScheduledAction(this, 'NightlySpinDown', {
+        autoScalingGroupName: asg.autoScalingGroupName,
+        recurrence: '0 10 * * *', // 10:00 UTC = 2:00 AM PST / 3:00 AM PDT
+        desiredCapacity: 0,
+        minSize: 0
+      });
+
+      new autoscaling.CfnScheduledAction(this, 'NightlySpinUp', {
+        autoScalingGroupName: asg.autoScalingGroupName,
+        recurrence: '30 10 * * *', // 10:30 UTC = 2:30 AM PST / 3:30 AM PDT
+        desiredCapacity: props.type.desiredInstances,
+        minSize: 0
+      });
+    }
   }
 
   // a host resource group is used by the launch template for placement of instances on dedicated hosts
