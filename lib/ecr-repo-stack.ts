@@ -7,6 +7,9 @@ import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-
 export class ECRRepositoryStack extends cdk.Stack {
   public readonly repositoryOutput: CfnOutput;
   public readonly repository: ecr.Repository;
+  public readonly osBuildCacheRepositoryOutput: CfnOutput;
+  public readonly osBuildCacheRepository: ecr.Repository;
+  
   constructor(scope: Construct, id: string, stage: string, props?: cdk.StackProps) {
     super(scope, id, props);
     applyTerminationProtectionOnStacks([this]);
@@ -15,8 +18,8 @@ export class ECRRepositoryStack extends cdk.Stack {
     const ecrRepository = new ecr.Repository(this, 'finch-rootfs', {
         repositoryName:repoName,
         imageTagMutability: ecr.TagMutability.IMMUTABLE,
-        // TODO: CFN does not provide APIs for enhanced image scanning. 
-        // To address, create a custom stack that uses the AWS sdk to change the account ECR 
+        // TODO: CFN does not provide APIs for enhanced image scanning.
+        // To address, create a custom stack that uses the AWS sdk to change the account ECR
         // scanning settings to enhanced.
 
         // For now, scan on image push is set to true. This means that the image will be scanned
@@ -28,5 +31,23 @@ export class ECRRepositoryStack extends cdk.Stack {
 
     this.repository = ecrRepository
     this.repositoryOutput = new CfnOutput(this, 'ECR repository', { value: ecrRepository.repositoryName });
+
+    // This repository is needed to hold build caches for Finch's OS builds.
+    const osBuildCacheRepoName = `finch-os-build-cache-${stage.toLowerCase()}`;
+    const osBuildCacheRepository = new ecr.Repository(this, 'finch-os-build-cache', {
+      repositoryName: osBuildCacheRepoName,
+      imageTagMutability: ecr.TagMutability.MUTABLE,
+      imageScanOnPush: false,
+      lifecycleRules: [
+        {
+          description: 'Expire untagged build cache layers after 30 days',
+          tagStatus: ecr.TagStatus.UNTAGGED,
+          maxImageAge: cdk.Duration.days(30),
+        },
+      ],
+    });
+
+    this.osBuildCacheRepository = osBuildCacheRepository;
+    this.osBuildCacheRepositoryOutput = new CfnOutput(this, 'ECR OS build cache repository', { value: osBuildCacheRepository.repositoryName });
   }
 }

@@ -34,6 +34,7 @@ export class FinchPipelineAppStage extends cdk.Stage {
   ecrRepositoryOutput: CfnOutput;
   public readonly cloudfrontBucket: s3.Bucket;
   public readonly ecrRepository: ecr.Repository;
+  public readonly osBuildCacheRepository: ecr.Repository;
 
   constructor(scope: Construct, id: string, props: FinchPipelineAppStageProps) {
     super(scope, id, props);
@@ -72,6 +73,7 @@ export class FinchPipelineAppStage extends cdk.Stage {
 
       this.ecrRepositoryOutput = ecrRepositoryStack.repositoryOutput;
       this.ecrRepository = ecrRepositoryStack.repository;
+      this.osBuildCacheRepository = ecrRepositoryStack.osBuildCacheRepository
 
       // Only report rootfs image scans in prod to avoid duplicate notifications.
       if (props.environmentStage == ENVIRONMENT_STAGE.Prod) {
@@ -83,7 +85,8 @@ export class FinchPipelineAppStage extends cdk.Stage {
       }
 
       new ContinuousIntegrationStack(this, 'FinchContinuousIntegrationStack', this.stageName, {
-        rootfsEcrRepository: this.ecrRepository
+        rootfsEcrRepository: this.ecrRepository,
+        osBuildCacheEcrRepository: this.osBuildCacheRepository,
       });
     }
 

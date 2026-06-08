@@ -9,6 +9,7 @@ import { applyTerminationProtectionOnStacks } from './aspects/stack-termination-
 
 interface ContinuousIntegrationStackProps extends cdk.StackProps {
   rootfsEcrRepository: ecr.Repository;
+  osBuildCacheEcrRepository: ecr.Repository;
 }
 
 // ContinuousIntegrationStack - AWS stack for supporting Finch's continuous integration process
@@ -59,8 +60,8 @@ export class ContinuousIntegrationStack extends cdk.Stack {
     const repo = props.rootfsEcrRepository;
     repo.grantPullPush(githubActionsRole);
     ecr.AuthorizationToken.grantRead(githubActionsRole)
-    
-    // Permission to delete images from ECR is required by this workflow 
+
+    // Permission to delete images from ECR is required by this workflow
     // https://github.com/runfinch/finch-core/blob/main/.github/workflows/push-container-image.yaml
     // to clean up unused os images and reduce aws-inspector generated noise.
     githubActionsRole.addToPolicy(
@@ -69,6 +70,11 @@ export class ContinuousIntegrationStack extends cdk.Stack {
         resources: [repo.repositoryArn]
       })
     );
+
+    // Add push/pull access to osBuildCacheEcrRepository 
+    // for the github actions role.
+    const osBuildCacheRepo = props.osBuildCacheEcrRepository;
+    osBuildCacheRepo.grantPullPush(githubActionsRole);
 
     new CloudfrontCdn(this, 'DependenciesCloudfrontCdn', {
       bucket
