@@ -4,9 +4,9 @@ import { EnvConfig } from '../config/env-config';
 export const getMacBaseCapacityForAccount = (accountId?: string): number => {
   switch (accountId) {
     case EnvConfig.envRelease.account:
-      return 3;
+      return 2;
     case EnvConfig.envProd.account:
-      return 3;
+      return 2;
     default:
       return 1;
   }
