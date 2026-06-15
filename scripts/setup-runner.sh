@@ -56,3 +56,49 @@ su - ec2-user -c "cd $RUNNER_DIR && ./svc.sh install"
 PLIST_NAME="actions.runner.runfinch-$REPO.$(hostname | cut -d '.' -f 1).plist"
 cp /Users/ec2-user/Library/LaunchAgents/$PLIST_NAME /Library/LaunchDaemons
 /bin/launchctl load /Library/LaunchDaemons/$PLIST_NAME
+
+# Install and configure CloudWatch agent for log shipping
+CW_AGENT_URL="https://amazoncloudwatch-agent.s3.amazonaws.com/darwin/arm64/latest/amazon-cloudwatch-agent.pkg"
+if [ $(arch) != "arm64" ]; then
+  CW_AGENT_URL="https://amazoncloudwatch-agent.s3.amazonaws.com/darwin/amd64/latest/amazon-cloudwatch-agent.pkg"
+fi
+curl -o /tmp/amazon-cloudwatch-agent.pkg -L "$CW_AGENT_URL"
+installer -pkg /tmp/amazon-cloudwatch-agent.pkg -target /
+
+INSTANCE_ID=$(TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") && curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json << EOF
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/system.log",
+            "log_group_name": "/ec2/runners/${REPO}/${LABEL_ARCH}-${LABEL_VER}",
+            "log_stream_name": "${INSTANCE_ID}/system.log",
+            "retention_in_days": 30
+          },
+          {
+            "file_path": "/Users/ec2-user/ar/_diag/Runner_*.log",
+            "log_group_name": "/ec2/runners/${REPO}/${LABEL_ARCH}-${LABEL_VER}",
+            "log_stream_name": "${INSTANCE_ID}/runner-diag",
+            "retention_in_days": 30
+          },
+          {
+            "file_path": "/Users/ec2-user/setup-runner.log",
+            "log_group_name": "/ec2/runners/${REPO}/${LABEL_ARCH}-${LABEL_VER}",
+            "log_stream_name": "${INSTANCE_ID}/setup-runner",
+            "retention_in_days": 30
+          }
+        ]
+      }
+    }
+  }
+}
+EOF
+
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config \
+  -m ec2 \
+  -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json \
+  -s

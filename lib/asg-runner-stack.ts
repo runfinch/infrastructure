@@ -150,6 +150,7 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
     role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'));
     role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AutoScalingFullAccess'));
     role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('ResourceGroupsandTagEditorFullAccess'));
+    role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'));
 
     // Grant EC2 instances access to secretsmanager to retrieve the GitHub api key to register runners
     role.addToPolicy(
