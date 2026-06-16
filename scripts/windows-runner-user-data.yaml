@@ -156,6 +156,46 @@ tasks:
 
           Invoke-Expression "cmd.exe /c sc config $ServiceName obj= '$(hostname)\Administrator' password= '$GH_KEY' type= own"
 
+          # Install and configure CloudWatch agent for log shipping
+          Write-Information "Installing CloudWatch Agent..."
+          Invoke-WebRequest -Uri 'https://amazoncloudwatch-agent.s3.amazonaws.com/windows/amd64/latest/amazon-cloudwatch-agent.msi' -OutFile 'C:\Users\Administrator\setup\amazon-cloudwatch-agent.msi'
+          Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\amazon-cloudwatch-agent.msi /quiet'
+
+          $Token = Invoke-RestMethod -Uri http://169.254.169.254/latest/api/token -Method PUT -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"="21600"}
+          $CWInstanceId = Invoke-RestMethod -Uri http://169.254.169.254/latest/meta-data/instance-id -Headers @{"X-aws-ec2-metadata-token"=$Token}
+          $CWConfig = @"
+          {
+            "logs": {
+              "logs_collected": {
+                "files": {
+                  "collect_list": [
+                    {
+                      "file_path": "C:\\actions-runner\\_diag\\Runner_*.log",
+                      "log_group_name": "/ec2/runners/$REPO/amd64-windows",
+                      "log_stream_name": "$CWInstanceId/runner-diag",
+                      "retention_in_days": 30
+                    },
+                    {
+                      "file_path": "C:\\UserData.log",
+                      "log_group_name": "/ec2/runners/$REPO/amd64-windows",
+                      "log_stream_name": "$CWInstanceId/userdata",
+                      "retention_in_days": 30
+                    },
+                    {
+                      "file_path": "C:\\StartupScript.log",
+                      "log_group_name": "/ec2/runners/$REPO/amd64-windows",
+                      "log_stream_name": "$CWInstanceId/startup",
+                      "retention_in_days": 30
+                    }
+                  ]
+                }
+              }
+            }
+          }
+"@
+          Set-Content 'C:\ProgramData\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.json' $CWConfig
+          & 'C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1' -a fetch-config -m ec2 -c file:C:\ProgramData\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.json -s
+
           wsl --install
 
           Write-Information "Restarting instance..."

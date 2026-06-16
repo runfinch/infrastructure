@@ -182,3 +182,44 @@ cd "${RUNNER_DIR}"
 semanage fcontext -a -t "bin_t" "${RUNNER_DIR}/runsvc.sh"
 ./svc.sh install "${USERNAME}"
 ./svc.sh start
+
+# Install and configure CloudWatch agent for log shipping
+yum install -y amazon-cloudwatch-agent || true
+
+INSTANCE_ID=$(TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") && curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json << CWEOF
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/messages",
+            "log_group_name": "/ec2/runners/${REPO}/${GH_RUNNER_ARCH}-${DISTRO}-${OS_VERSION}",
+            "log_stream_name": "${INSTANCE_ID}/messages",
+            "retention_in_days": 30
+          },
+          {
+            "file_path": "${RUNNER_DIR}/_diag/Runner_*.log",
+            "log_group_name": "/ec2/runners/${REPO}/${GH_RUNNER_ARCH}-${DISTRO}-${OS_VERSION}",
+            "log_stream_name": "${INSTANCE_ID}/runner-diag",
+            "retention_in_days": 30
+          },
+          {
+            "file_path": "/var/log/setup-runner.log",
+            "log_group_name": "/ec2/runners/${REPO}/${GH_RUNNER_ARCH}-${DISTRO}-${OS_VERSION}",
+            "log_stream_name": "${INSTANCE_ID}/setup-runner",
+            "retention_in_days": 30
+          }
+        ]
+      }
+    }
+  }
+}
+CWEOF
+
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config \
+  -m ec2 \
+  -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json \
+  -s
