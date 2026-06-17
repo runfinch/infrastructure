@@ -88,9 +88,9 @@ tasks:
 
           Write-Information "Downloading and configuring GitHub Actions Runner..."
           mkdir $RUNNER_DIR; cd $RUNNER_DIR
-          Invoke-WebRequest -Uri https://github.com/actions/runner/releases/download/v2.316.0/actions-runner-win-x64-2.316.0.zip -OutFile actions-runner-win-x64-2.316.0.zip
-          if((Get-FileHash -Path actions-runner-win-x64-2.316.0.zip -Algorithm SHA256).Hash.ToUpper() -ne '9b2d0443d11ce5c2c4391d708576dc37b1ecf62edcceec7c0c9c8e6b4472b5a1'.ToUpper()){ throw 'Computed checksum did not match' }
-          Add-Type -AssemblyName System.IO.Compression.FileSystem ;  [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD/actions-runner-win-x64-2.316.0.zip", "$PWD")
+          Invoke-WebRequest -Uri https://github.com/actions/runner/releases/download/v2.333.0/actions-runner-win-x64-2.333.0.zip -OutFile actions-runner-win-x64-2.333.0.zip
+          if((Get-FileHash -Path actions-runner-win-x64-2.333.0.zip -Algorithm SHA256).Hash.ToUpper() -ne '7176d0c4b674d4108b515503a53b4bc9eeab9339c645e274a97c142fe1c64b95'.ToUpper()){ throw 'Computed checksum did not match' }
+          Add-Type -AssemblyName System.IO.Compression.FileSystem ;  [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD/actions-runner-win-x64-2.333.0.zip", "$PWD")
 
           $GH_KEY=(Get-SECSecretValue -SecretId $REPO-runner-reg-key -Region $REGION).SecretString
           $LABEL_OS_VER=$([System.Environment]::OSVersion.Version.Major)
