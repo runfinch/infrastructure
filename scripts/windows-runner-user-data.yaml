@@ -163,36 +163,7 @@ tasks:
 
           $Token = Invoke-RestMethod -Uri http://169.254.169.254/latest/api/token -Method PUT -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"="21600"}
           $CWInstanceId = Invoke-RestMethod -Uri http://169.254.169.254/latest/meta-data/instance-id -Headers @{"X-aws-ec2-metadata-token"=$Token}
-          $CWConfig = @"
-          {
-            "logs": {
-              "logs_collected": {
-                "files": {
-                  "collect_list": [
-                    {
-                      "file_path": "C:\\actions-runner\\_diag\\Runner_*.log",
-                      "log_group_name": "/ec2/runners/$REPO/amd64-windows",
-                      "log_stream_name": "$CWInstanceId/runner-diag",
-                      "retention_in_days": 30
-                    },
-                    {
-                      "file_path": "C:\\UserData.log",
-                      "log_group_name": "/ec2/runners/$REPO/amd64-windows",
-                      "log_stream_name": "$CWInstanceId/userdata",
-                      "retention_in_days": 30
-                    },
-                    {
-                      "file_path": "C:\\StartupScript.log",
-                      "log_group_name": "/ec2/runners/$REPO/amd64-windows",
-                      "log_stream_name": "$CWInstanceId/startup",
-                      "retention_in_days": 30
-                    }
-                  ]
-                }
-              }
-            }
-          }
-"@
+          $CWConfig = '{"logs":{"logs_collected":{"files":{"collect_list":[{"file_path":"C:\\actions-runner\\_diag\\Runner_*.log","log_group_name":"/ec2/runners/' + $REPO + '/amd64-windows","log_stream_name":"' + $CWInstanceId + '/runner-diag","retention_in_days":30},{"file_path":"C:\\UserData.log","log_group_name":"/ec2/runners/' + $REPO + '/amd64-windows","log_stream_name":"' + $CWInstanceId + '/userdata","retention_in_days":30},{"file_path":"C:\\StartupScript.log","log_group_name":"/ec2/runners/' + $REPO + '/amd64-windows","log_stream_name":"' + $CWInstanceId + '/startup","retention_in_days":30}]}}}}'
           Set-Content 'C:\ProgramData\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.json' $CWConfig
           & 'C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1' -a fetch-config -m ec2 -c file:C:\ProgramData\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.json -s
 
