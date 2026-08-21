@@ -65,8 +65,8 @@ tasks:
           Remove-Item AWSCLIV2.msi
               
           # Install Go
-          Invoke-WebRequest -Uri 'https://go.dev/dl/go1.23.3.windows-amd64.msi' -OutFile 'go1.23.3.windows-amd64.msi'
-          Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Users\Administrator\setup\go1.23.3.windows-amd64.msi /quiet'
+          Invoke-WebRequest -Uri 'https://go.dev/dl/go1.25.12.windows-amd64.msi' -OutFile 'go1.25.12.windows-amd64.msi'
+          Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Users\Administrator\setup\go1.25.12.windows-amd64.msi /quiet'
 
           # Install yq
           Invoke-WebRequest -Uri 'https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_windows_amd64.exe' -OutFile '.\bin\yq.exe'
@@ -119,11 +119,7 @@ tasks:
           $ServiceName=(Get-Service actions.runner.*).name
           $startupscript = @'
           Start-Transcript -Path "C:\StartupScript.log" -Append
-          Invoke-WebRequest -Uri 'https://github.com/microsoft/WSL/releases/download/2.4.13/wsl.2.4.13.0.x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl.2.4.13.0.x64.msi'
-          Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl.2.4.13.0.x64.msi /L*V C:\WSLInstallation.log /quiet'
-          # Update the WSL kernel
-          Invoke-WebRequest -Uri 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi' -OutFile 'C:\Users\Administrator\setup\wsl_update_x64.msi'
-          Start-Process msiexec.exe -Wait -ArgumentList '/i C:\Users\Administrator\setup\wsl_update_x64.msi /L*V C:\WSLInstallation.log /quiet'
+          wsl --update
           Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
           Add-MpPreference -ExclusionPath "C:\Users\ADMINI~1\AppData\Local\Temp\go-build*" -Force
           Start-Job -ScriptBlock { Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu' }
