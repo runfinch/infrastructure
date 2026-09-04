@@ -119,7 +119,17 @@ tasks:
           $ServiceName=(Get-Service actions.runner.*).name
           $startupscript = @'
           Start-Transcript -Path "C:\StartupScript.log" -Append
-          wsl --update
+          # Pin WSL (and its bundled kernel) to a known-good release instead of the latest GA.
+          # 'wsl --update' has no version flag and floats the kernel to whatever is newest on boot;
+          # kernel 6.18.x regressed the finch additional_disk e2e (container task does not survive
+          # vm remove + re-init on 6.18). WSL 2.4.13 bundles kernel 5.15.167.4 (last CI-green).
+          # Dollar-signs are escaped (backtick-dollar) so these evaluate at boot, not at ExpandString write time.
+          `$wslMsiUrl = "https://github.com/microsoft/WSL/releases/download/2.4.13/wsl.2.4.13.0.x64.msi"
+          `$wslMsi = "`$env:TEMP\wsl.2.4.13.0.x64.msi"
+          `$wslSha256 = "A327590770BD334878FB47113355AA07CFCF056ACDC08F5E5646A2418C66D721"
+          Invoke-WebRequest -Uri `$wslMsiUrl -OutFile `$wslMsi
+          if ((Get-FileHash -Path `$wslMsi -Algorithm SHA256).Hash.ToUpper() -ne `$wslSha256) { throw "WSL MSI checksum mismatch" }
+          Start-Process msiexec.exe -Wait -ArgumentList "/i `"`$wslMsi`" /quiet"
           Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
           Add-MpPreference -ExclusionPath "C:\Users\ADMINI~1\AppData\Local\Temp\go-build*" -Force
           Start-Job -ScriptBlock { Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu' }
