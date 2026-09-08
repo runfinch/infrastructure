@@ -238,10 +238,23 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
       ]
     };
 
+    // Dedicated-host runners (macOS/Windows) run on scarce metal capacity that is
+    // allocated just-in-time. A rolling update that terminates an instance BEFORE its
+    // replacement is InService leaves a capacity gap: if metal capacity is momentarily
+    // unavailable, the replacement cannot launch, the batch never stabilizes, and the
+    // CloudFormation update fails (and can wedge in UPDATE_ROLLBACK_FAILED). To make
+    // deploys resilient we give these ASGs N+1 headroom (maxCapacity = desired + 1) and
+    // keep desired instances in service during a rolling update (launch-before-terminate),
+    // which requires a reserved spare host slot (see the host resource group below, which
+    // retains hosts rather than auto-releasing them). maxCapacity > desired also means a
+    // bad instance can always be replaced without deadlocking.
+    const usesDedicatedHosts = this.requiresDedicatedHosts();
+    const maxCapacity = usesDedicatedHosts ? props.type.desiredInstances + 1 : props.type.desiredInstances;
+
     const asg = new autoscaling.AutoScalingGroup(this, asgName, {
       vpc,
       desiredCapacity: props.type.desiredInstances,
-      maxCapacity: props.type.desiredInstances,
+      maxCapacity,
       minCapacity: 0,
       healthCheck: autoscaling.HealthCheck.ec2({
         grace: cdk.Duration.seconds(3600)
@@ -251,7 +264,13 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
         // Defaults shown here explicitly except for pauseTime
         // and minSuccesPercentage
         maxBatchSize: 1,
-        minInstancesInService: 0,
+        // For dedicated-host (metal) runners, keep all desired instances in service while
+        // rolling so a replacement must reach InService before the old instance is
+        // terminated (launch-before-terminate). This avoids the "terminate first, then
+        // fail to launch on insufficient metal capacity" wedge. Requires N+1 capacity
+        // (maxCapacity above) and a reserved host slot. Non-metal ASGs keep the prior
+        // behavior (0), since they scale on abundant capacity.
+        minInstancesInService: usesDedicatedHosts ? props.type.desiredInstances : 0,
         suspendProcesses: [
           autoscaling.ScalingProcess.HEALTH_CHECK,
           autoscaling.ScalingProcess.REPLACE_UNHEALTHY,
@@ -293,8 +312,17 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
               values: ['true']
             },
             {
+              // Retain dedicated hosts instead of auto-releasing them after an instance
+              // terminates. macOS/Windows metal capacity is scarce and allocated
+              // just-in-time; auto-releasing forces the ASG to re-compete for metal
+              // capacity on every deploy/replacement, which causes "Insufficient
+              // capacity" launch failures and wedged CloudFormation updates. Retaining
+              // hosts keeps the (N+1) reserved slots so launch-before-terminate rolling
+              // updates always have somewhere to place the replacement. Note: macOS
+              // dedicated hosts have a ~24h minimum allocation regardless, so retaining
+              // them adds little effective cost while removing the capacity gamble.
               name: 'auto-release-host',
-              values: ['true']
+              values: ['false']
             },
             {
               name: 'any-host-based-license-configuration',
