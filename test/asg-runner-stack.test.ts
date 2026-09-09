@@ -54,7 +54,7 @@ describe('ASGRunnerStack test', () => {
         }
         case PlatformType.MAC: {
           if (type.arch === 'arm') {
-            instanceType = 'mac2.metal';
+            instanceType = 'mac-m4.metal';
           } else {
             instanceType = 'mac1.metal';
           }
