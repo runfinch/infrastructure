@@ -120,6 +120,37 @@ describe('ASGRunnerStack test', () => {
       });
   });
 
+  it('pins the host resource group to the correct instance family per platform/arch', () => {
+    // The host resource group must be pinned (via the 'allowed-host-families'
+    // AWS::EC2::HostManagement parameter) to the family matching the launch template's
+    // instanceType, otherwise EC2 can auto-allocate/retain the wrong host family and reject
+    // placement of the instance ("The requested configuration is currently not supported").
+    //   mac + arm -> mac-m4 (mac-m4.metal),  mac + x86 -> mac1 (mac1.metal),  windows -> c7i.
+    const expectedFamily = (type: RunnerType): string => {
+      if (type.platform === PlatformType.MAC) {
+        return type.arch === 'arm' ? 'mac-m4' : 'mac1';
+      }
+      return 'c7i'; // windows
+    };
+
+    runnerConfig.runnerTypes
+      .filter((type) => type.platform === PlatformType.MAC || type.platform === PlatformType.WINDOWS)
+      .forEach((type) => {
+        const stack = stacks.find((s) => s.stackName === generateASGStackName(type));
+        const template = Template.fromStack(stack!);
+        template.hasResourceProperties('AWS::ResourceGroups::Group', {
+          Configuration: Match.arrayWith([
+            Match.objectLike({
+              Type: 'AWS::EC2::HostManagement',
+              Parameters: Match.arrayWith([
+                Match.objectLike({ Name: 'allowed-host-families', Values: [expectedFamily(type)] })
+              ])
+            })
+          ])
+        });
+      });
+  });
+
   it('non-dedicated-host runners keep maxCapacity equal to desired', () => {
     runnerConfig.runnerTypes
       .filter((type) => type.platform === PlatformType.AMAZONLINUX)

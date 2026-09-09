@@ -43,6 +43,25 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
 
   requiresDedicatedHosts = () => this.platform === PlatformType.MAC || this.platform === PlatformType.WINDOWS;
 
+  // The dedicated-host instance family that the host resource group must be pinned to.
+  // Derived from platform/arch so it always matches the launch template's instanceType:
+  //   mac + arm -> 'mac-m4' (mac-m4.metal), mac + x86 -> 'mac1' (mac1.metal),
+  //   windows    -> 'c7i'    (c7i.2xlarge).
+  // Pinning the family via the 'allowed-host-families' HostManagement parameter forces the
+  // group to auto-allocate the CORRECT host family for the instance type being launched.
+  // Without it the group could retain/auto-allocate a stale family (e.g. the old mac2 hosts),
+  // and EC2 rejects placement of a mac-m4.metal instance with "The requested configuration is
+  // currently not supported."
+  dedicatedHostFamily = (): string => {
+    if (this.platform === PlatformType.MAC) {
+      return this.arch === 'arm' ? 'mac-m4' : 'mac1';
+    }
+    if (this.platform === PlatformType.WINDOWS) {
+      return 'c7i';
+    }
+    throw new Error(`No dedicated host family defined for platform '${this.platform}'`);
+  };
+
   userData = (props: ASGRunnerStackProps, setupScriptName: string) =>
     `#!/bin/bash
   LABEL_STAGE=${props.stage === ENVIRONMENT_STAGE.Release ? 'release' : 'test'}
@@ -205,7 +224,11 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
 
     let ltPlacementConfig = {};
     if (this.requiresDedicatedHosts()) {
-      const hostResourceGroup = this.createHostResourceGroup(resourceGroupName, resourceGroupDescription);
+      const hostResourceGroup = this.createHostResourceGroup(
+        resourceGroupName,
+        resourceGroupDescription,
+        this.dedicatedHostFamily()
+      );
       ltPlacementConfig = {
         placement: {
           tenancy: 'host',
@@ -301,7 +324,7 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
   }
 
   // a host resource group is used by the launch template for placement of instances on dedicated hosts
-  createHostResourceGroup(resourceGroupName: string, resourceGroupDescription: string) {
+  createHostResourceGroup(resourceGroupName: string, resourceGroupDescription: string, hostFamily: string) {
     return new resourcegroups.CfnGroup(this, resourceGroupName, {
       name: resourceGroupName,
       description: resourceGroupDescription,
@@ -314,6 +337,18 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
             {
               name: 'auto-allocate-host',
               values: ['true']
+            },
+            {
+              // Pin the instance family the group is allowed to allocate/place hosts for so it
+              // always matches the launch template's instanceType (mac-arm=mac-m4, mac-x86=mac1,
+              // windows=c7i). Without this pin the group can retain/auto-allocate a stale family
+              // (the old mac2 hosts predate the mac-m4.metal move in #1117), and EC2 refuses to
+              // place a mac-m4.metal instance -> "The requested configuration is currently not
+              // supported." 'allowed-host-families' is the supported AWS::EC2::HostManagement
+              // parameter for this (values are family identifiers, e.g. 'mac-m4', not full
+              // instance types like 'mac-m4.metal').
+              name: 'allowed-host-families',
+              values: [hostFamily]
             },
             {
               // Retain dedicated hosts instead of auto-releasing them after an instance
