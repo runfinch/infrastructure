@@ -120,21 +120,6 @@ describe('ASGRunnerStack test', () => {
       });
   });
 
-  it('references the launch template $Latest version by id (not a pinned version or name)', () => {
-    // The stack overrides the ASG's LaunchTemplate to reference the launch template by id
-    // at its $Latest version, so new launches always pick up the newest LT version rather
-    // than a version number pinned at synth time.
-    templates.forEach((template) => {
-      template.hasResourceProperties('AWS::AutoScaling::AutoScalingGroup', {
-        LaunchTemplate: {
-          LaunchTemplateId: Match.anyValue(),
-          Version: '$Latest',
-          LaunchTemplateName: Match.absent()
-        }
-      });
-    });
-  });
-
   it('non-dedicated-host runners keep maxCapacity equal to desired', () => {
     runnerConfig.runnerTypes
       .filter((type) => type.platform === PlatformType.AMAZONLINUX)

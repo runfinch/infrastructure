@@ -290,20 +290,6 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
       this.createTagBasedResourceGroup(resourceGroupName, resourceGroupDescription, asg.autoScalingGroupName);
     }
 
-    // Make the ASG always launch from the launch template's newest version ($Latest)
-    // instead of a version number pinned at synth time. This ensures that new launches,
-    // scale-outs, and instance refreshes pick up the most recent launch template version
-    // whenever a change is deployed (or a new LT version is otherwise created). The L2
-    // AutoScalingGroup pins Version to LatestVersionNumber captured at deploy time, so we
-    // override the CfnAutoScalingGroup's LaunchTemplate.Version to the literal "$Latest".
-    // Note: $Latest affects NEW instance launches; already-running instances are replaced
-    // by the rolling UpdatePolicy above on deploy.
-    const cfnAsg = asg.node.defaultChild as autoscaling.CfnAutoScalingGroup;
-    cfnAsg.addPropertyOverride('LaunchTemplate.LaunchTemplateId', lt.launchTemplateId);
-    cfnAsg.addPropertyOverride('LaunchTemplate.Version', '$Latest');
-    // Remove the L2-generated LaunchTemplateName if present to avoid specifying both id and name.
-    cfnAsg.addPropertyDeletionOverride('LaunchTemplate.LaunchTemplateName');
-
     if (props.stage === ENVIRONMENT_STAGE.Beta) {
       new autoscaling.CfnScheduledAction(this, 'SpinDownBetaInstances', {
         autoScalingGroupName: asg.autoScalingGroupName,
