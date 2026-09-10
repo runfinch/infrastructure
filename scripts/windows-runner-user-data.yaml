@@ -153,15 +153,16 @@ tasks:
           # Install with a timeout + retry. Right after the Appx removal, msiexec can block on the
           # Windows Installer lock indefinitely; time out, kill, and retry instead of hanging the
           # script forever (a hang here strands the instance in Standby, before Exit-ASStandby below).
+          # 600s is generous - a real install finishes in ~1-2 min - so we only kill a genuine hang.
           `$installed = `$false
-          for (`$i = 1; `$i -le 4 -and -not `$installed; `$i++) {
+          for (`$i = 1; `$i -le 3 -and -not `$installed; `$i++) {
               Get-Process msiexec -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
               Start-Sleep 5
               `$proc = Start-Process msiexec.exe -PassThru -ArgumentList "/i `"`$wslMsi`" /quiet /norestart /l*v `$env:TEMP\wslmsi.log"
-              if (`$proc.WaitForExit(180000)) {
+              if (`$proc.WaitForExit(600000)) {
                   if (`$proc.ExitCode -eq 0) { `$installed = `$true } else { Write-Warning "msiexec attempt `$i exited `$(`$proc.ExitCode)" }
               } else {
-                  Write-Warning "msiexec attempt `$i timed out after 180s; killing and retrying"
+                  Write-Warning "msiexec attempt `$i timed out after 600s; killing and retrying"
                   try { `$proc | Stop-Process -Force -ErrorAction SilentlyContinue } catch {}
               }
           }
