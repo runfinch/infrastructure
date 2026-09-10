@@ -71,11 +71,7 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
       case PlatformType.MAC: {
         rootDeviceName = '/dev/sda1';
         if (this.arch === 'arm') {
-          // Use mac-m4.metal (Apple M4) for arm macOS runners. The older mac2.metal (M2)
-          // has scarce dedicated-host capacity in our regions, causing ASG launch failures
-          // and wedged CloudFormation deploys. aws-cdk-lib 2.266.0 has no M4 InstanceClass
-          // enum, so construct the type from its string identifier.
-          instanceType = new ec2.InstanceType('mac-m4.metal');
+          instanceType = ec2.InstanceType.of(ec2.InstanceClass.MAC2, ec2.InstanceSize.METAL);
         } else {
           instanceType = ec2.InstanceType.of(ec2.InstanceClass.MAC1, ec2.InstanceSize.METAL);
         }
