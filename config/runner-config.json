@@ -137,7 +137,8 @@
           "us-west-2b",
           "us-west-2c",
           "us-west-2d"
-        ]
+        ],
+        "launchTemplateVersion": "4"
       },
       {
         "platform": "mac",
@@ -150,7 +151,8 @@
           "us-west-2b",
           "us-west-2c",
           "us-west-2d"
-        ]
+        ],
+        "launchTemplateVersion": "14"
       },
       {
         "platform": "mac",
@@ -176,7 +178,8 @@
           "us-west-2b",
           "us-west-2c",
           "us-west-2d"
-        ]
+        ],
+        "launchTemplateVersion": "4"
       },
       {
         "platform": "mac",
@@ -189,7 +192,8 @@
           "us-west-2b",
           "us-west-2c",
           "us-west-2d"
-        ]
+        ],
+        "launchTemplateVersion": "17"
       },
       {
         "platform": "mac",

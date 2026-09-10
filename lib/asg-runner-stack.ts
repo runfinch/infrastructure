@@ -246,7 +246,19 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
       healthCheck: autoscaling.HealthCheck.ec2({
         grace: cdk.Duration.seconds(3600)
       }),
-      launchTemplate: lt,
+      // When a launch template version is pinned in config (currently only the
+      // Prod arm-mac runners), reference that exact version so a deploy leaves
+      // the ASG's LaunchTemplateSpecification unchanged and does NOT recycle the
+      // running instances onto scarce Mac dedicated-host capacity. Otherwise fall
+      // back to the L2 launch template, which tracks LatestVersionNumber and rolls
+      // instances on every deploy that creates a new version (prior behavior,
+      // retained for Beta/Release).
+      launchTemplate: props.type.launchTemplateVersion
+        ? ec2.LaunchTemplate.fromLaunchTemplateAttributes(this, `${ltName}Pinned`, {
+            launchTemplateId: lt.launchTemplateId,
+            versionNumber: props.type.launchTemplateVersion
+          })
+        : lt,
       updatePolicy: UpdatePolicy.rollingUpdate({
         // Defaults shown here explicitly except for pauseTime
         // and minSuccesPercentage
