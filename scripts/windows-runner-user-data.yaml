@@ -25,6 +25,13 @@ tasks:
           $REPO="<REPO>"
           $REGION="<REGION>"
 
+          # Prevent the Microsoft Store from auto-updating apps (notably WSL). WSL ships as a Store
+          # app, and the Store floats it to the latest GA - which drifts the runner off the pinned
+          # WSL 2.4.13 / kernel 5.15.167.4 (see startup.ps1 below) onto kernel 6.18.x that regresses
+          # the finch disk-attach e2e (WSL_E_WSL2_NEEDED). 2 = turn off automatic download/install.
+          New-Item -Path 'HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore' -Force | Out-Null
+          Set-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore' -Name 'AutoDownload' -Type DWord -Value 2
+
           Write-Information "Installing latest powershell7 version..."
           Invoke-Expression "& { $(Invoke-RestMethod 'https://aka.ms/install-powershell.ps1') } -useMSI -EnablePSRemoting -Quiet"
 
@@ -120,16 +127,33 @@ tasks:
           $startupscript = @'
           Start-Transcript -Path "C:\StartupScript.log" -Append
           # Pin WSL (and its bundled kernel) to a known-good release instead of the latest GA.
-          # 'wsl --update' has no version flag and floats the kernel to whatever is newest on boot;
-          # kernel 6.18.x regressed the finch additional_disk e2e (container task does not survive
-          # vm remove + re-init on 6.18). WSL 2.4.13 bundles kernel 5.15.167.4 (last CI-green).
+          # WSL ships as a Microsoft Store app; the Store / 'wsl --update' floats the kernel to the
+          # newest GA. Kernel 6.18.x regressed the finch additional_disk / disk-attach e2e
+          # (WSL_E_WSL2_NEEDED, container task does not survive vm remove + re-init). WSL 2.4.13
+          # bundles kernel 5.15.167.4 (last CI-green). Store auto-update is disabled in the
+          # first-boot script above so this pin holds across the instance lifetime.
           # Dollar-signs are escaped (backtick-dollar) so these evaluate at boot, not at ExpandString write time.
           `$wslMsiUrl = "https://github.com/microsoft/WSL/releases/download/2.4.13/wsl.2.4.13.0.x64.msi"
           `$wslMsi = "`$env:TEMP\wsl.2.4.13.0.x64.msi"
           `$wslSha256 = "A327590770BD334878FB47113355AA07CFCF056ACDC08F5E5646A2418C66D721"
+          `$wslPinnedVersion = "2.4.13.0"
+          # If the Store has already floated WSL past the pin, shut it down and remove it so the
+          # pinned MSI installs clean (an in-place older-MSI-over-newer-Store-app install is refused).
+          wsl --shutdown 2>`$null
+          `$wslPkg = Get-AppxPackage -AllUsers *WindowsSubsystemForLinux*
+          if (`$wslPkg -and `$wslPkg.Version -ne `$wslPinnedVersion) {
+              Write-Output "WSL `$(`$wslPkg.Version) detected; removing to pin to `$wslPinnedVersion"
+              try { `$wslPkg | Remove-AppxPackage -AllUsers -ErrorAction Stop } catch { Write-Warning "WSL Appx remove failed: `$_" }
+              Get-AppxProvisionedPackage -Online | Where-Object { `$_.PackageName -like '*WindowsSubsystemForLinux*' } |
+                  ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName `$_.PackageName -ErrorAction SilentlyContinue }
+          }
           Invoke-WebRequest -Uri `$wslMsiUrl -OutFile `$wslMsi
           if ((Get-FileHash -Path `$wslMsi -Algorithm SHA256).Hash.ToUpper() -ne `$wslSha256) { throw "WSL MSI checksum mismatch" }
           Start-Process msiexec.exe -Wait -ArgumentList "/i `"`$wslMsi`" /quiet"
+          # Verify the pin took. Log loudly so a drifted runner is visible in StartupScript.log /
+          # CloudWatch instead of silently failing finch e2e later with WSL_E_WSL2_NEEDED.
+          `$wslVer = (& wsl --version | Out-String)
+          if (`$wslVer -notmatch '2\.4\.13') { Write-Error "WSL pin FAILED: expected 2.4.13, got: `$wslVer" } else { Write-Output "WSL pinned OK: `$wslVer" }
           Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
           Add-MpPreference -ExclusionPath "C:\Users\ADMINI~1\AppData\Local\Temp\go-build*" -Force
           Start-Job -ScriptBlock { Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu' }
