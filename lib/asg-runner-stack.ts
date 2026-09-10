@@ -293,8 +293,10 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
               values: ['true']
             },
             {
+              // Retain the dedicated host so a replacement instance relaunches onto the same
+              // held host (avoids re-allocating a scarce Mac dedicated host).
               name: 'auto-release-host',
-              values: ['true']
+              values: ['false']
             },
             {
               name: 'any-host-based-license-configuration',

@@ -144,7 +144,7 @@
         "version": "15.7",
         "arch": "arm",
         "repo": "finch",
-        "desiredInstances": 2,
+        "desiredInstances": 1,
         "availabilityZones": [
           "us-west-2a",
           "us-west-2b",
