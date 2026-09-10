@@ -19,6 +19,25 @@ export interface RunnerType {
   repo: string;
   desiredInstances: number;
   availabilityZones: Array<string>;
+  /**
+   * Optional: pin the ASG to a specific launch template version number
+   * (e.g. "14") instead of tracking the launch template's latest version.
+   *
+   * When set, the ASG references this exact version, so a deploy that does
+   * not change this value leaves the ASG's LaunchTemplateSpecification
+   * unchanged and therefore does NOT trigger a rolling update / instance
+   * replacement. Use this to apply stack changes to dedicated-host (mac)
+   * runners without recycling the running instances (scarce metal capacity).
+   *
+   * Set it to the version the ASG's instances are currently running. To
+   * intentionally roll instances onto a newer launch template version, bump
+   * this value (or remove it to resume tracking the latest version).
+   *
+   * When omitted, the ASG tracks the launch template's LatestVersionNumber
+   * (the prior behavior), so each deploy that creates a new version rolls the
+   * instances.
+   */
+  launchTemplateVersion?: string;
 }
 
 export const enum PlatformType {
