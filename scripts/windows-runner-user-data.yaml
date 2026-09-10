@@ -126,20 +126,21 @@ tasks:
           $ServiceName=(Get-Service actions.runner.*).name
           $startupscript = @'
           Start-Transcript -Path "C:\StartupScript.log" -Append
-          # Pin WSL (and its bundled kernel) to a known-good release instead of the latest GA.
+          # ---- Pin WSL to 2.4.13 (kernel 5.15.167.4) and ensure a WSL2 distro exists ----
           # WSL ships as a Microsoft Store app; the Store / 'wsl --update' floats the kernel to the
-          # newest GA. Kernel 6.18.x regressed the finch additional_disk / disk-attach e2e
-          # (WSL_E_WSL2_NEEDED, container task does not survive vm remove + re-init). WSL 2.4.13
-          # bundles kernel 5.15.167.4 (last CI-green). Store auto-update is disabled in the
-          # first-boot script above so this pin holds across the instance lifetime.
-          # Dollar-signs are escaped (backtick-dollar) so these evaluate at boot, not at ExpandString write time.
+          # newest GA. Kernel 6.18.x regressed the finch disk-attach e2e (WSL_E_WSL2_NEEDED); 2.4.13
+          # is the last CI-green build. Store auto-update is disabled in the first-boot script above
+          # so this pin holds. This whole block must finish before Exit-ASStandby so a runner never
+          # serves finch e2e without a working WSL2.
+          # Dollar-signs are escaped (backtick-dollar) so they evaluate at boot; $ASGName / $InstanceId
+          # are intentionally expanded now (ExpandString) when the file is written.
           `$wslMsiUrl = "https://github.com/microsoft/WSL/releases/download/2.4.13/wsl.2.4.13.0.x64.msi"
           `$wslMsi = "`$env:TEMP\wsl.2.4.13.0.x64.msi"
           `$wslSha256 = "A327590770BD334878FB47113355AA07CFCF056ACDC08F5E5646A2418C66D721"
           `$wslPinnedVersion = "2.4.13.0"
-          # If the Store has already floated WSL past the pin, shut it down and remove it so the
-          # pinned MSI installs clean (an in-place older-MSI-over-newer-Store-app install is refused).
           wsl --shutdown 2>`$null
+          # If the Store has floated WSL past the pin, remove it so the pinned MSI installs clean
+          # (an in-place older-MSI-over-newer-Store-app install is refused).
           `$wslPkg = Get-AppxPackage -AllUsers *WindowsSubsystemForLinux*
           if (`$wslPkg -and `$wslPkg.Version -ne `$wslPinnedVersion) {
               Write-Output "WSL `$(`$wslPkg.Version) detected; removing to pin to `$wslPinnedVersion"
@@ -149,15 +150,39 @@ tasks:
           }
           Invoke-WebRequest -Uri `$wslMsiUrl -OutFile `$wslMsi
           if ((Get-FileHash -Path `$wslMsi -Algorithm SHA256).Hash.ToUpper() -ne `$wslSha256) { throw "WSL MSI checksum mismatch" }
-          Start-Process msiexec.exe -Wait -ArgumentList "/i `"`$wslMsi`" /quiet"
-          # Verify the pin took. Log loudly so a drifted runner is visible in StartupScript.log /
-          # CloudWatch instead of silently failing finch e2e later with WSL_E_WSL2_NEEDED.
-          `$wslVer = (& wsl --version | Out-String)
-          if (`$wslVer -notmatch '2\.4\.13') { Write-Error "WSL pin FAILED: expected 2.4.13, got: `$wslVer" } else { Write-Output "WSL pinned OK: `$wslVer" }
+          # Install with a timeout + retry. Right after the Appx removal, msiexec can block on the
+          # Windows Installer lock indefinitely; time out, kill, and retry instead of hanging the
+          # script forever (a hang here strands the instance in Standby, before Exit-ASStandby below).
+          # 600s is generous - a real install finishes in ~1-2 min - so we only kill a genuine hang.
+          `$installed = `$false
+          for (`$i = 1; `$i -le 3 -and -not `$installed; `$i++) {
+              Get-Process msiexec -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+              Start-Sleep 5
+              `$proc = Start-Process msiexec.exe -PassThru -ArgumentList "/i `"`$wslMsi`" /quiet /norestart /l*v `$env:TEMP\wslmsi.log"
+              if (`$proc.WaitForExit(600000)) {
+                  if (`$proc.ExitCode -eq 0) { `$installed = `$true } else { Write-Warning "msiexec attempt `$i exited `$(`$proc.ExitCode)" }
+              } else {
+                  Write-Warning "msiexec attempt `$i timed out after 600s; killing and retrying"
+                  try { `$proc | Stop-Process -Force -ErrorAction SilentlyContinue } catch {}
+              }
+          }
+          if (-not `$installed) { Write-Error "WSL 2.4.13 MSI install did not complete after retries" }
+          # finch's disk attach requires WSL2.
+          wsl --set-default-version 2
+          # A WSL2 distro must be registered so the WSL2 utility VM exists; finch vm init attaches
+          # its disk via 'wsl --mount --bare --vhd', which fails with WSL_E_WSL2_NEEDED when no distro
+          # is present. Distros are per-user; startup.ps1 runs as Administrator (the runner service
+          # account), which is the same account finch e2e runs under.
+          `$lxss = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss'
+          if (-not (Get-ChildItem `$lxss -ErrorAction SilentlyContinue)) {
+              Write-Output "Installing Ubuntu WSL2 distro"
+              wsl --install -d Ubuntu --no-launch
+              Start-Sleep 45
+          }
+          if (Get-ChildItem `$lxss -ErrorAction SilentlyContinue) { Write-Output "WSL2 distro registered" } else { Write-Error "WSL2 distro install FAILED (no distro registered); finch vm init will hit WSL_E_WSL2_NEEDED" }
+          wsl --version | Out-String | Write-Output
           Exit-ASStandby -AutoScalingGroupName $ASGName -InstanceId $InstanceId
           Add-MpPreference -ExclusionPath "C:\Users\ADMINI~1\AppData\Local\Temp\go-build*" -Force
-          Start-Job -ScriptBlock { Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu' }
-          sleep 30 # sleep to allow Ubuntu VM to start
 
           # Use "netsh interface ipv4 show addresses" to list all adapter names
           New-NetFirewallRule -DisplayName "WSL" -Direction Inbound -InterfaceAlias "vEthernet (WSL (Hyper-V firewall))" -Action Allow
