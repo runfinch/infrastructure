@@ -49,7 +49,7 @@ describe('ASGRunnerStack test', () => {
       let instanceType = '';
       switch (type.platform) {
         case PlatformType.WINDOWS: {
-          instanceType = 'c7i.2xlarge';
+          instanceType = 'm5zn.metal';
           break;
         }
         case PlatformType.MAC: {

@@ -90,12 +90,13 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
         break;
       }
       case PlatformType.WINDOWS: {
-        // C7i instances support nested virtualization.
-        // See - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/amazon-ec2-nested-virtualization.html?icmpid=docs_console_unmapped.
-        instanceType = ec2.InstanceType.of(ec2.InstanceClass.C7I, ec2.InstanceSize.XLARGE2);
+        // Windows runners run on bare metal (m5zn.metal) so WSL2's Hyper-V VM works natively.
+        // The move to virtualized c7i.2xlarge + nested virtualization (#1108) broke WSL2 distro
+        // registration (Wsl/Service/RegisterDistro/0x8007007a), failing every Windows finch e2e.
+        instanceType = ec2.InstanceType.of(ec2.InstanceClass.M5ZN, ec2.InstanceSize.METAL);
         asgName = 'WindowsASG';
         rootDeviceName = '/dev/sda1';
-        machineImage = ec2.MachineImage.latestWindows(ec2.WindowsVersion.WINDOWS_SERVER_2025_ENGLISH_FULL_BASE);
+        machineImage = ec2.MachineImage.latestWindows(ec2.WindowsVersion.WINDOWS_SERVER_2022_ENGLISH_FULL_BASE);
         // We need to provide user data as a yaml file to specify runAs: admin
         // Maintain that file as yaml and source here to ensure formatting.
         userDataString = readFileSync('./scripts/windows-runner-user-data.yaml', 'utf8')
@@ -218,12 +219,6 @@ export class ASGRunnerStack extends cdk.Stack implements IASGRunnerStack {
       ...(this.requiresDedicatedHosts() && {
         ...ltPlacementConfig,
         licenseSpecifications: [{ licenseConfigurationArn: props.licenseArn }]
-      }),
-      // Nested virtualization is required for WSL2 on Windows runners.
-      ...(this.platform === PlatformType.WINDOWS && {
-        cpuOptions: {
-          nestedVirtualization: 'enabled'
-        }
       }),
       tagSpecifications: [
         {
