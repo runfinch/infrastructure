@@ -115,7 +115,6 @@ tasks:
 
           # Script runs on login after reboot to start GitHub Actions service, put the instance InService in the ASG,
           # and update wsl version to pre-release verion such that ssh / session 0 connections can call wsl
-          # Allow inbound connections on vEthernet interface for traffic from wsl to host
           $ServiceName=(Get-Service actions.runner.*).name
           $startupscript = @'
           Start-Transcript -Path "C:\StartupScript.log" -Append
@@ -128,7 +127,23 @@ tasks:
           Add-MpPreference -ExclusionPath "C:\Users\ADMINI~1\AppData\Local\Temp\go-build*" -Force
           Start-Job -ScriptBlock { Start-Process -NoNewWindow -FilePath wsl -ArgumentList '--install Ubuntu' }
           sleep 30 # sleep to allow Ubuntu VM to start
-          New-NetFirewallRule -DisplayName "WSL" -Direction Inbound -InterfaceAlias "vEthernet (WSL)" -Action Allow
+          # Allow TCP from the WSL VM to the host's address on the WSL NAT adapter (finch's --add-host host-gateway e2e
+          # test needs it). WSL recreates that adapter with a new subnet whenever it restarts, so finch's container e2e
+          # suite replaces this rule (same group) on every run; this boot-time copy covers anything that runs before it.
+          `$wslAddr = `$null
+          for (`$i = 0; `$i -lt 60 -and -not `$wslAddr; `$i++) {
+            `$wslAddr = Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object InterfaceAlias -like 'vEthernet (WSL*' | Select-Object -First 1
+            if (-not `$wslAddr) { sleep 5 }
+          }
+          if (`$wslAddr) {
+            `$wslSubnet = (Get-NetRoute -InterfaceIndex `$wslAddr.InterfaceIndex -AddressFamily IPv4 | Where-Object NextHop -eq '0.0.0.0' | Where-Object DestinationPrefix -match '/([1-9]|[12][0-9]|3[01])$' | Where-Object DestinationPrefix -ne '224.0.0.0/4' | Select-Object -First 1).DestinationPrefix
+          }
+          if (`$wslAddr -and `$wslSubnet) {
+            Remove-NetFirewallRule -Group 'Finch WSL to host' -ErrorAction SilentlyContinue
+            New-NetFirewallRule -DisplayName 'Finch WSL to host' -Group 'Finch WSL to host' -Direction Inbound -Action Allow -Protocol TCP -LocalAddress `$wslAddr.IPAddress -RemoteAddress `$wslSubnet
+          } else {
+            Write-Warning "WSL network adapter not found; skipping the WSL to host firewall rule"
+          }
           '@
 
           # Write startup powershell script to file. 
